@@ -1,5 +1,7 @@
 apply plugin: 'com.android.application'
 
+def ndkHome = System.env.ANDROID_HOME ? "${System.env.ANDROID_HOME}/ndk/27.2.12479018" : System.env.ANDROID_NDK_HOME
+
 android {
     namespace "app.personaldictation.mobile"
     compileSdk rootProject.ext.compileSdkVersion
@@ -17,7 +19,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         ndk { abiFilters 'arm64-v8a', 'x86_64' }
-        externalNativeBuild { cmake { arguments '-DANDROID_STL=c++_shared' } }
+        externalNativeBuild { cmake { arguments '-DANDROID_STL=c++_shared', '-DVulkan_INCLUDE_DIRS=' + ndkHome + '/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/include', '-DVulkan_LIBRARY=' + ndkHome + '/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/35/libvulkan.so', '-DVulkan_GLSLC_EXECUTABLE=' + ndkHome + '/shader-tools/linux-x86_64/glslc' } }
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
