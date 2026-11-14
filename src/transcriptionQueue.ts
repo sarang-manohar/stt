@@ -5,7 +5,7 @@ export type ModelSetting = TranscriptionModel | 'auto';
 export interface TranscriptionResult {
   text: string;
   language?: string;
-  model: TranscriptionModel | 'whisper-tiny-local';
+  model: TranscriptionModel | 'whisper-small-local';
 }
 const languageCode = (language: unknown): string | undefined => {
   if (typeof language !== 'string') return undefined;

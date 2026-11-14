@@ -6,7 +6,7 @@ import { AudioRecorder } from './audioRecorder';
 import { TranscriptionQueue, type ModelSetting, type TranscriptionResult } from './transcriptionQueue';
 import { TranscriptDocument } from './transcriptDocument';
 import { renderTranscript } from './transcriptView';
-import { device, native, monitorConnectivity, offlineTranscribe, parseCredentials } from './deviceServices';
+import { device, native, monitorConnectivity, offlineTranscribe } from './deviceServices';
 
 const element = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const status = element('status');
@@ -72,13 +72,9 @@ let online = native ? false : navigator.onLine;
 let networkKnown = !native;
 let notesLoaded = false;
 let modelReady = false;
-let gitConfigured = false;
-let syncPending = false;
-let syncing = false;
 let saving = 0;
 let saveFailed = false;
 let saveChain = Promise.resolve();
-const syncButton = element<HTMLButtonElement>('sync-notes');
 document.querySelector('header')?.classList.toggle('native', native);
 const getKey = () => envKey || savedKey;
 function persistNotes(): void {
@@ -88,26 +84,11 @@ function persistNotes(): void {
     if (native) await device.saveNotes({ document: snapshot });
     else localStorage.setItem('dictation-notes', JSON.stringify(snapshot));
     saveFailed = false;
-    syncPending = true;
   }).catch(() => {
     saveFailed = true;
     notice.textContent = 'Local save failed. Keep this app open and export your notes.';
   }).finally(() => { saving--; render(); });
 }
-async function syncNotes(): Promise<void> {
-  if (!native || syncing) return;
-  if (!gitConfigured) { settingsDialog.showModal(); return; }
-  syncing = true; render();
-  try {
-    await saveChain;
-    if (saveFailed) throw new Error('Local save failed; export your notes before syncing.');
-    const result = await device.sync();
-    syncPending = result.pending;
-    notice.textContent = result.pending ? 'Offline: GitHub sync queued for reconnection.' : 'Notes synced to GitHub.';
-  } catch (error) { notice.textContent = error instanceof Error ? error.message : 'GitHub sync failed. Notes remain saved locally.'; }
-  finally { syncing = false; render(); }
-}
-syncButton.addEventListener('click', () => { void syncNotes(); });
 const queue = new TranscriptionQueue({
   getKey,
   isOnline: () => online,
@@ -145,9 +126,6 @@ function render(): void {
   if (!notesLoaded || !networkKnown) label = 'Loading…';
   else if (saving && label === 'Ready') label = 'Saving…';
   status.textContent = label;
-  syncButton.hidden = !native;
-  syncButton.disabled = !notesLoaded || !networkKnown || recording || transitioning || state.size > 0 || saving > 0 || syncing;
-  syncButton.textContent = syncing ? 'Syncing…' : syncPending ? online ? 'Sync ↑' : 'Queue sync' : 'Sync';
   const connectivity = element('connectivity');
   connectivity.textContent = networkKnown ? online ? 'Online Mode' : 'Offline Mode' : 'Checking network…';
   connectivity.classList.toggle('offline', !online);
@@ -169,7 +147,7 @@ function render(): void {
   const detection = element('detection');
   detection.hidden = !resolved;
   detection.textContent = resolved
-    ? `${languageSelect.value === 'auto' ? `Detected ${detectedLanguage === 'hi' ? 'Hindi' : detectedLanguage === 'en' ? 'English' : 'unknown'} · ` : ''}${resolved.model === 'whisper-tiny-local' ? 'tiny · on-device' : resolved.model === 'whisper-large-v3' ? 'v3' : 'v3-turbo'}` : '';
+    ? `${languageSelect.value === 'auto' ? `Detected ${detectedLanguage === 'hi' ? 'Hindi' : detectedLanguage === 'en' ? 'English' : 'unknown'} · ` : ''}${resolved.model === 'whisper-small-local' ? 'small · on-device' : resolved.model === 'whisper-large-v3' ? 'v3' : 'v3-turbo'}` : '';
   record.hidden = recording;
   record.disabled = transitioning || !notesLoaded || !networkKnown;
   record.classList.toggle('recording', recording);
@@ -319,19 +297,6 @@ panel.addEventListener('focusout', event => {
   }
 });
 element('device-settings').hidden = !native;
-element('git-form').addEventListener('submit', async event => {
-  event.preventDefault();
-  const credentialsInput = element<HTMLInputElement>('git-credentials');
-  try {
-    const file = credentialsInput.files?.[0];
-    if (!file || file.size > 16384) throw new Error('Select a small .git_credentials file.');
-    await device.configureGit({ repository: element<HTMLInputElement>('git-repository').value.trim(), credentials: parseCredentials(await file.text()) });
-    gitConfigured = true;
-    if (documentTranscript.hasEntries) { persistNotes(); await saveChain; }
-    notice.textContent = 'GitHub connected. Use Sync when Ready.';
-  } catch (error) { notice.textContent = error instanceof Error ? error.message : 'Could not configure GitHub.'; }
-  finally { credentialsInput.value = ''; render(); }
-});
 element('download-model').addEventListener('click', async () => {
   const button = element<HTMLButtonElement>('download-model');
   button.hidden = true;
@@ -354,9 +319,8 @@ async function initializeDevice(): Promise<void> {
     if (native) {
       const saved = await device.loadNotes();
       if (saved.document) documentTranscript.restore(saved.document);
-      gitConfigured = saved.configured; syncPending = saved.pending;
       modelReady = (await device.modelStatus()).ready;
-      element('offline-model-status').textContent = modelReady ? 'Offline Whisper ready · multilingual tiny q5_1' : 'Model not installed. Download once before going offline.';
+      element('offline-model-status').textContent = modelReady ? 'Offline Whisper ready · multilingual small Q5_K_M' : 'Model not installed. Download once before going offline.';
     } else {
       const saved = localStorage.getItem('dictation-notes');
       if (saved) documentTranscript.restore(JSON.parse(saved));
@@ -375,10 +339,6 @@ window.addEventListener('beforeunload', event => {
 log({ event: 'settings.loaded', message: `Settings loaded · ${modelSelect.selectedOptions[0].text} · ${languageSelect.selectedOptions[0].text}.`,
   details: { model: modelSelect.value, language: languageSelect.value } });
 setInterval(render, 250);
-if (native) setInterval(() => {
-  if (!notesLoaded || saving || syncing) return;
-  void device.gitStatus().then(state => { syncPending = state.pending; gitConfigured = state.configured; render(); }).catch(() => { /* Keep last known status. */ });
-}, 5000);
 render();
 // Native assets are bundled with each APK; a worker could serve stale app code.
 if (!Capacitor.isNativePlatform() && 'serviceWorker' in navigator && import.meta.env.PROD) {

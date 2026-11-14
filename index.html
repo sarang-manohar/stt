@@ -17,7 +17,6 @@
         <button id="open-settings" class="gear-button" type="button" aria-label="Transcription settings" aria-haspopup="dialog" aria-controls="settings-dialog" title="Transcription settings">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2h5l.5 2.5 2 1.2 2.4-.8 2.5 4.3-1.9 1.7v2.2l1.9 1.7-2.5 4.3-2.4-.8-2 1.2-.5 2.5h-5L9 19.5l-2-1.2-2.4.8-2.5-4.3L4 13.1v-2.2L2.1 9.2l2.5-4.3 2.4.8L9 4.5Z"/><circle cx="12" cy="12" r="3"/></svg>
         </button>
-        <button id="sync-notes" type="button" title="Sync notes to GitHub" aria-label="Sync notes to GitHub">Sync</button>
       </header>
       <section class="transcript-panel" aria-label="Transcript">
         <div class="tools"><span>TRANSCRIPT</span><div><button id="copy" type="button" title="Copy timestamp-keyed transcript JSON">Copy</button><button id="share-transcript" type="button" title="Share timestamp-keyed transcript JSON">Share</button><button id="clear" type="button">Clear</button></div></div>
@@ -39,21 +38,12 @@
       <dialog id="settings-dialog" aria-labelledby="settings-title">
         <h1 id="settings-title">Transcription settings</h1>
         <p>Choose automatic detection or set your language and model.</p>
-        <p class="hint">Online audio goes to Groq. Offline audio stays on this Android device. Notes are saved locally; GitHub sync uploads text only.</p>
+        <p class="hint">Online audio goes to Groq. Offline audio stays on this Android device. Notes are saved locally.</p>
         <section id="device-settings">
           <h2>Offline Whisper</h2>
           <p id="offline-model-status" role="status">Checking model…</p>
           <button id="download-model" type="button">Download tiny model (32 MB)</button>
-          <p class="hint">Download once while online, before going offline. Quantized multilingual tiny runs locally; speed and accuracy depend on your device.</p>
-          <h2>GitHub notes repository</h2>
-          <form id="git-form">
-            <label for="git-repository">Existing repository (owner/name, main branch)</label>
-            <input id="git-repository" placeholder="owner/dictation-notes" autocomplete="off" required pattern="[A-Za-z0-9-]+/[A-Za-z0-9_.-]+" />
-            <label for="git-credentials">Import .git_credentials (PAT with Contents: read/write)</label>
-            <input id="git-credentials" type="file" />
-            <p class="hint">Use a private repository. Tokens are encrypted with Android Keystore, never bundled or committed. Unsynced commits survive offline use and app restarts.</p>
-            <button type="submit">Connect repository</button>
-          </form>
+          <p class="hint">Download once while online, before going offline. Quantized multilingual small runs locally; speed and accuracy depend on your device.</p>
         </section>
         <div class="transcription-settings">
           <label for="language">Language</label>

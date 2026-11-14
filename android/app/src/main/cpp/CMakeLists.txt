@@ -8,6 +8,8 @@ set(WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(WHISPER_BUILD_SERVER OFF CACHE BOOL "" FORCE)
 set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
 set(GGML_NATIVE OFF CACHE BOOL "" FORCE)
+# Enable Vulkan backend for Adreno GPU acceleration on Android.
+set(GGML_VULKAN ON CACHE BOOL "" FORCE)
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/vendor/whisper.cpp/CMakeLists.txt")
   message(FATAL_ERROR "Run npm run android:prepare-whisper before building Android")
 endif()

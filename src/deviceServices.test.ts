@@ -1,21 +1,8 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { monitorConnectivity, parseCredentials } from './deviceServices';
+import { monitorConnectivity } from './deviceServices';
 import { TranscriptDocument } from './transcriptDocument';
 afterEach(() => vi.unstubAllGlobals());
 
-it.each([
-  ['GITHUB_PERSONAL_ACCESS_TOKEN=github_pat_example', 'github_pat_example'],
-  ['GITHUB_PERSONAL_ACCESS_TOKEN="github_pat_example"', 'github_pat_example'],
-  ['https://alice:ghp_example@github.com', 'ghp_example'],
-  ['https://github_pat_example@github.com', 'github_pat_example'],
-  ['username=alice\npassword=ghp_example', 'ghp_example'],
-  ['ghp_example', 'ghp_example'],
-])('imports supported credential format without retaining its file: %s', (input, token) => {
-  expect(parseCredentials(input)).toBe(token);
-});
-it.each(['https://alice:token@evil.example', 'not a token', '', 'https://github.com'])('rejects unsupported credentials: %s', input => {
-  expect(() => parseCredentials(input)).toThrow();
-});
 it('updates browser network indicators and removes listeners on cleanup', async () => {
   const target = new EventTarget();
   vi.stubGlobal('window', target); vi.stubGlobal('navigator', { onLine: true });

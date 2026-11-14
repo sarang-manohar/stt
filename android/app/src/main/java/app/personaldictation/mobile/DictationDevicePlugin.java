@@ -19,8 +19,8 @@ public class DictationDevicePlugin extends Plugin {
     private ConnectivityManager manager;
     private ConnectivityManager.NetworkCallback callback;
     private volatile boolean downloading;
-    private static final String MODEL_HASH = "818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7";
-    private static final long MODEL_SIZE = 32152673;
+    private static final String MODEL_HASH = "PLACEHOLDER_SHA256_FOR_SMALL_Q5_K_M";
+    private static final long MODEL_SIZE = 99317376;
     private static native String whisperTranscribe(String path, byte[] wav, String language);
     static { System.loadLibrary("dictation-whisper"); }
     static boolean isOnline(Context context) {
@@ -38,12 +38,10 @@ public class DictationDevicePlugin extends Plugin {
         };
         if (android.os.Build.VERSION.SDK_INT >= 24) manager.registerDefaultNetworkCallback(callback);
         else manager.registerNetworkCallback(new NetworkRequest.Builder().addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET).build(), callback);
-        new NotesRepository(getContext()).schedule();
     }
     private void changed() {
         JSObject status = new JSObject(); status.put("online", isOnline(getContext()));
         notifyListeners("networkChanged", status);
-        if (isOnline(getContext())) new NotesRepository(getContext()).schedule();
     }
     @Override protected void handleOnDestroy() {
         if (callback != null) manager.unregisterNetworkCallback(callback);
@@ -55,47 +53,28 @@ public class DictationDevicePlugin extends Plugin {
     @PluginMethod public void loadNotes(PluginCall call) {
         io.execute(() -> {
             try {
-                NotesRepository repository = new NotesRepository(getContext());
-                String json = repository.load();
+                String json = new java.io.File(getContext().getFilesDir(), "dictation-notes.json").exists()
+                    ? new String(java.nio.file.Files.readAllBytes(new java.io.File(getContext().getFilesDir(), "dictation-notes.json").toPath()), java.nio.charset.StandardCharsets.UTF_8)
+                    : null;
                 JSObject result = new JSObject();
                 if (json != null) result.put("document", new JSONObject(json));
-                result.put("pending", repository.pending()); result.put("configured", repository.configured()); call.resolve(result);
+                call.resolve(result);
             } catch (Exception e) { call.reject("Could not load saved notes."); }
         });
-    }
-    @PluginMethod public void gitStatus(PluginCall call) {
-        NotesRepository repository = new NotesRepository(getContext());
-        JSObject result = new JSObject(); result.put("pending", repository.pending()); result.put("configured", repository.configured()); call.resolve(result);
     }
     @PluginMethod public void saveNotes(PluginCall call) {
         JSObject document = call.getObject("document");
         if (document == null) { call.reject("Missing transcript."); return; }
         io.execute(() -> {
             try {
-                NotesRepository repository = new NotesRepository(getContext());
-                repository.save(document.toString(2)); repository.schedule(); call.resolve();
+                java.io.File file = new java.io.File(getContext().getFilesDir(), "dictation-notes.json");
+                java.nio.file.Files.write(file.toPath(), document.toString(2).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                call.resolve();
             }
-            catch (Exception e) { call.reject("Could not save notes to the local repository."); }
+            catch (Exception e) { call.reject("Could not save notes locally."); }
         });
     }
-    @PluginMethod public void configureGit(PluginCall call) {
-        String repository = call.getString("repository", ""); String credentials = call.getString("credentials", "");
-        io.execute(() -> {
-            try { new NotesRepository(getContext()).configure(repository, credentials); call.resolve(); }
-            catch (Exception e) { call.reject(e.getMessage()); }
-        });
-    }
-    @PluginMethod public void sync(PluginCall call) {
-        io.execute(() -> {
-            NotesRepository repository = new NotesRepository(getContext());
-            try {
-                repository.schedule();
-                if (isOnline(getContext())) repository.sync();
-                JSObject result = new JSObject(); result.put("pending", repository.pending()); call.resolve(result);
-            } catch (Exception e) { call.reject(e.getMessage()); }
-        });
-    }
-    private File model() { return new File(getContext().getFilesDir(), "ggml-tiny-q5_1.bin"); }
+    private File model() { return new File(getContext().getFilesDir(), "ggml-small-q5_k_m.bin"); }
     @PluginMethod public void modelStatus(PluginCall call) {
         JSObject result = new JSObject(); result.put("ready", model().isFile() && model().length() == MODEL_SIZE); call.resolve(result);
     }
@@ -107,7 +86,7 @@ public class DictationDevicePlugin extends Plugin {
             try {
                 if (!isOnline(getContext())) throw new IOException("Connect to the internet to download the offline model first.");
                 // HTTPS + pinned SHA-256: a changed upstream file is rejected, never loaded.
-                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) new URL("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny-q5_1.bin").openConnection();
+                java.net.HttpURLConnection connection = (java.net.HttpURLConnection) new URL("https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small-q5_k_m.bin").openConnection();
                 connection.setConnectTimeout(30000); connection.setReadTimeout(30000);
                 MessageDigest digest = MessageDigest.getInstance("SHA-256");
                 long size = 0;
