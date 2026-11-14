@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:eb919e2e32cf764ef94791f4d97f0b252531d3cb0efe7bf41f10995ec85d9059",
+  "claims": [
+    {
+      "id": "claim_367c1d0be2bf413fae6647742fa2969c",
+      "statement": "The Vite PWA/Capacitor Android UI integrates recording and FIFO with saved/restored TranscriptDocument snapshots; shared entries drive safe timestamped rows, edits and JSON Copy/Share while plain text supplies prompts. Native Share uses cached JSON and browser Share uses file/text or download fallback; the internal save utility has no UI control. Android adds validated connectivity, prepared offline Whisper and a rightmost Ready-state Sync control. Activity Trail remains collapsed by default with heading toggling and outside/Escape dismissal.",
+      "evidence": [
+        {
+          "resource": "repo://index.html",
+          "version": "repo-file-v1:sha256:5ce5dd2d9ed074e1dd2ef68e90b3e7f50a8010ebe8194cb76c46949bf3d1ae88"
+        },
+        {
+          "resource": "repo://src/deviceServices.ts",
+          "version": "repo-file-v1:sha256:cf672b57a838db95cf9fbc486d9b75d4a76b47e8965f67c0b3fd76bc6824e2e7"
+        },
+        {
+          "resource": "repo://src/exportTranscript.ts",
+          "version": "repo-file-v1:sha256:df1919a6440971622de0db574496af13bd45ca1bb40de269cbd51932fbda21e3"
+        },
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        },
+        {
+          "resource": "repo://src/transcriptDocument.ts",
+          "version": "repo-file-v1:sha256:da7f42ec3d157177e16496cd9de0f98bf02fc8ed96936a42dafa0e95306c7772"
+        },
+        {
+          "resource": "repo://src/transcriptView.ts",
+          "version": "repo-file-v1:sha256:bd14f4cc6a7eea8f4e9cbe01a20eb9166a4461058f972883f7d0de1ecdd07066"
+        }
+      ]
+    },
+    {
+      "id": "claim_0e345c4d9dd04e28ab45ed91b3b6960f",
+      "statement": "Maintainer verification includes unit tests, strict web/Android web-asset builds and installed-Chrome synthetic-microphone smoke with mocked Groq covering routing, timestamped UI/JSON parity, Copy/Share and download fallback, removal of Save and the JSON button, dialog focus/busy locks, safe text, portrait/narrow/landscape layout, top-right settings and collapsed Activity Trail tap/keyboard behavior. Gradle scripts and CI build a debug APK; physical-device recording, permissions and sharing still require manual validation.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/android.yml",
+          "version": "repo-file-v1:sha256:acb8cea1cc86dd33303d0d76332c38b5cac66c9beb8a456e225fc8d21b4a2426"
+        },
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:3bcc36f817a1cfaccc3ea0eb34e651479f3741f91e4616701120008ee316727e"
+        },
+        {
+          "resource": "repo://package.json",
+          "version": "repo-file-v1:sha256:fd201bfbe29a8219b96a6696586f9747e529e5ff9b4c5102e2d3d9de0c97b1bd"
+        },
+        {
+          "resource": "repo://scripts/browser-smoke.mjs",
+          "version": "repo-file-v1:sha256:7f9f088c9f8f797423eb27948f876ef6ea6c8053c7c3eebaa3bf98748a1ede95"
+        }
+      ]
+    },
+    {
+      "id": "claim_9e19c9bf2699415ea7b25815b1f89b82",
+      "statement": "The recorder emits overlapping ten-second 16 kHz PCM windows at an eight-second stride, and the FIFO only starts each subsequent chunk after synchronous merging of the previous result, including any automatic model refinement.",
+      "evidence": [
+        {
+          "resource": "repo://src/audioRecorder.ts#L4-L42",
+          "version": "repo-lines-v1:sha256:ae649eac45eadfb10395b22fe5968371c070b9acea9d28ba3d3b488586880231:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNDc2YjAyODc3Njk2NzlmZjc4YzMwYjNkMjA2Mzc5YWQwZDc1NmJiODU0NzQ0NzNmYTNmYWQzNDkwNjk3NzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4ZDI2YzRmZDg5Njk5NTg4Y2IyNWFlODIwNjgwZDFiMTYzMzY3N2MyNDA2YTk0Yjg2YTYxMGE2YzA1MzAxNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODRjNmI1NTJlMTMwYTU3YzM1MDQyZTUxODA3ZmQ2YzJlYzkzNDc3YjZjNjc0YzhhNDVmN2I0ZjRkODEyODEifQ"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.test.ts",
+          "version": "repo-file-v1:sha256:f4c5a0dbf2e161ef573bb661aaf2421764f2c4c7833599a6ca41bc3b45f43996"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.ts",
+          "version": "repo-file-v1:sha256:a38ba856e449f3de7aeb960eac7f16f6910aa43cd7a644bba3820d915d967c5b"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:28:39.707Z"
+  }
+}

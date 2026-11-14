@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "pages": {
+    "/openwiki/architecture/audio-pipeline.md": {
+      "sourceFingerprint": "sha256:0429f573bca27e38b1dd25c720778c1ae2898744aea63ccea1568ee24e9daccd",
+      "pageVersion": "sha256:7617a49e1bf5c5fd61e7a9581239dbb218fdaf49b4d14969120c26598c3805ad",
+      "completedBy": "pi",
+      "completedRunId": "73ef2433-ef8d-43ad-870e-5b86ba8e3dd4"
+    },
+    "/openwiki/architecture/device-services.md": {
+      "pageVersion": "sha256:b727af8263981a79e8642e3bf391571158767c92606319aa5be58eee55932f4d",
+      "completedBy": "pi",
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+    },
+    "/openwiki/architecture/transcription.md": {
+      "pageVersion": "sha256:51ec8c7a60fd47411aac3051301331822d536cc99e8e3e855ae278327bd5a318",
+      "completedBy": "pi",
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+    },
+    "/openwiki/operations/development-and-pwa.md": {
+      "pageVersion": "sha256:3eb1dd548eb648a734c0852f7b7d57dba0bb361e57e1f5f8b8f7c7359249527c",
+      "completedBy": "pi",
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+    },
+    "/openwiki/quickstart.md": {
+      "pageVersion": "sha256:eb919e2e32cf764ef94791f4d97f0b252531d3cb0efe7bf41f10995ec85d9059",
+      "completedBy": "pi",
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+    }
+  }
+}

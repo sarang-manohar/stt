@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:7617a49e1bf5c5fd61e7a9581239dbb218fdaf49b4d14969120c26598c3805ad",
+  "claims": [
+    {
+      "id": "claim_098bd4c2652b4a7e857d23a05c112c7c",
+      "statement": "The PCM slicer emits 160000-sample windows at a 128000-sample stride, retains 32000 samples, and flushes at least 8000 residual samples only when some audio is newer than the last emitted end.",
+      "evidence": [
+        {
+          "resource": "repo://src/audioRecorder.test.ts#L6-L34",
+          "version": "repo-lines-v1:sha256:7a57b9ff85dc462776b87106c700d373b3a269ddf983b25f9ae4bb41a284833c:eyJzZWxlY3RlZExpbmVDb3VudCI6MjksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjJhNTlmYmQ5MTVjMTU4ZjA2YzFjNzkxOTAxNDk1NDA1MTE5NTNmZmE0NjA1OWVkMjJlYWVhYzBlNmFlYzVmOGQiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjNhM2U0NmY5NDI3NmI2ZjZmNGVkMWYwMmFmNzhiZWY2YTJlZTFjNDM5ZGQ1NTg0Yjk3Mzk0ODMxMzIxNGQyYjciLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg1NWMzZDk4YjNkNDA1YmZmM2EwZjdmZmE1YTU2Yjg0NTMwZTNkMmUzYTViNjlmM2M1OWY3ZDhlNjFmZTY2NDQiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlMWZhZDZjYWRiOGQ1Yzg3MGE3ZDAwZmI3ZWEyMjBjNDQzM2I0NTAyZGQ0ZDNmZjM4M2IzZTVmNDA2YzVhNTMifQ"
+        },
+        {
+          "resource": "repo://src/audioRecorder.ts#L4-L42",
+          "version": "repo-lines-v1:sha256:ae649eac45eadfb10395b22fe5968371c070b9acea9d28ba3d3b488586880231:eyJzZWxlY3RlZExpbmVDb3VudCI6MzksImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjYxNDc2YjAyODc3Njk2NzlmZjc4YzMwYjNkMjA2Mzc5YWQwZDc1NmJiODU0NzQ0NzNmYTNmYWQzNDkwNjk3NzEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjA4ZDI2YzRmZDg5Njk5NTg4Y2IyNWFlODIwNjgwZDFiMTYzMzY3N2MyNDA2YTk0Yjg2YTYxMGE2YzA1MzAxNTciLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImY0ODRjNmI1NTJlMTMwYTU3YzM1MDQyZTUxODA3ZmQ2YzJlYzkzNDc3YjZjNjc0YzhhNDVmN2I0ZjRkODEyODEifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_fd55802c96904612974cdb7d75e50ffe",
+      "statement": "The streaming resampler carries fractional bin coverage across input blocks and emits clamped signed 16-bit PCM at 16000 Hz using the actual AudioContext sample rate.",
+      "evidence": [
+        {
+          "resource": "repo://src/audioRecorder.test.ts",
+          "version": "repo-file-v1:sha256:d2facba0afdf2c9ec0215e8110a1e49cdd1861e49c2dd245e728e00efe32c019"
+        },
+        {
+          "resource": "repo://src/audioRecorder.ts#L44-L69",
+          "version": "repo-lines-v1:sha256:ac384196e4d430e5ba7f42920a002b25e4ae9f894e65ae6f2ac72d42ea9f8bbe:eyJzZWxlY3RlZExpbmVDb3VudCI6MjYsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImNjOThhNDBiMGU4ZDQwODE3Mzk4NTI5NTZlMjE4NGU5ZmNlMmMyNTVkZDViYmEzOTdmYTQ1MmFlZTRmYjIxMmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjAxYmE0NzE5YzgwYjZmZTkxMWIwOTFhN2MwNTEyNGI2NGVlZWNlOTY0ZTA5YzA1OGVmOGY5ODA1ZGFjYTU0NmIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6ImZiNTgwZTk2NGY4M2E0NzNmNDNkNDQzODQ2Mjk0OWQ2OGI1NjAwZmRhNzg3ZjE2Mzc0NWQwMGRlODljYmYzNmEiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjY0NmY3YjlhM2NjMWMyOTllYzAxMWI4NTU3ODU2M2M0NjU4ZTgxNjNhZTA2MTQ3NDEyY2NmNzM4ZGFkYzEyMWMifQ"
+        },
+        {
+          "resource": "repo://src/audioRecorder.ts#L93-L97",
+          "version": "repo-lines-v1:sha256:fa01c666b4063be01e566b41b6755c3746b32e1b83b4049df27acc25ea340d79:eyJzZWxlY3RlZExpbmVDb3VudCI6NSwiZmlyc3RTZWxlY3RlZExpbmVIYXNoIjoiOTM0ZjU3NTI0NGFiZDkzZjA2MDY3MzQ0ZGYyMmE3YmI5ZGFmYzU3YWIyODEwZjA2MjAyZWM4OWU0MzBlNWUwMCIsImxhc3RTZWxlY3RlZExpbmVIYXNoIjoiNmYzNjE0Y2ViNzg5Yjk0N2RjYWNlMDk1ZGRkNWViMTE0YWQwMDk5Mzc0MzBlYWYyNzVmMTJkZmE5ZmUzMTdjMCIsInByZWNlZGluZ0NvbnRleHRMaW5lQ291bnQiOjMsInByZWNlZGluZ0NvbnRleHRIYXNoIjoiMDFiMTk0YTkwZGNmY2M5NjY3YzMzNGRlZGRkN2JiMmRhNDU1ZGFmN2RjNjkwYjZiNjExYTU4N2U5ODNiYTE4MyIsImZvbGxvd2luZ0NvbnRleHRMaW5lQ291bnQiOjMsImZvbGxvd2luZ0NvbnRleHRIYXNoIjoiNDgwNDkyZDA0ZWM3YWNkYTM2MGM5Mzk4MmI0MmZiY2RmMzdkYWM0Yjc0MzdhNzFlOTdjMWJlMTQyNTYzZGNmNSJ9"
+        }
+      ]
+    },
+    {
+      "id": "claim_f873d07aaa094ff0ac14be41e2d77072",
+      "statement": "AudioRecorder prefers AudioWorklet with ScriptProcessor fallback, drains ordered worklet messages on stop with a 200 ms acknowledgement bound, flushes captured audio, stops microphone tracks, closes the context and releases its best-effort wake lock.",
+      "evidence": [
+        {
+          "resource": "repo://public/audio-worklet.js",
+          "version": "repo-file-v1:sha256:9a2a5a1a91b08977b4ca6ecf96b805d691370bc43bf64dd69209f487690409ea"
+        },
+        {
+          "resource": "repo://src/audioRecorder.ts#L87-L166",
+          "version": "repo-lines-v1:sha256:77732a310d56ff9337ccd069a9e30b1c38d903f16f0149eb876c726ceda1c258:eyJzZWxlY3RlZExpbmVDb3VudCI6ODAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjRmNjA1OWY2MTEyODMxNzViNjEwZTY3YzA3YzdhZDNmNDI4ZDNiYjBjZTNiNjViZGI2NTdlZjQyYjBmZTFiN2UiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNzE4ZTlkMWU5ZmMwNDliMmE1NWFkNTQxZDQ5ZmRlNmYzZGI1NThjZjg5NGEyNmZlODUzMmY3OTRkYmM0OTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_be229965d0bf4e3f8d8e464884b3dc88",
+      "statement": "WAV encoding writes canonical 44-byte little-endian mono 16000 Hz 16-bit PCM headers and slice-time filenames use rec_YYYYMMDD_HHMMSS_mmm.wav in local calendar time.",
+      "evidence": [
+        {
+          "resource": "repo://src/wavEncoder.test.ts",
+          "version": "repo-file-v1:sha256:1f6aaa78ceb23d4df51bc0a7bd0b320d67fd92b676ef3d76091812e646fdbf4b"
+        },
+        {
+          "resource": "repo://src/wavEncoder.ts",
+          "version": "repo-file-v1:sha256:38c517dde3edfa8ca20e621f0bead2de00f5a9e33271b690caf56e2af3411668"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T06:09:50.195Z"
+  }
+}

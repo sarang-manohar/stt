@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f4f6fb" />
+    <meta name="description" content="Simple, private-to-you speech dictation powered by Groq Whisper." />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <title>Dictation</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand"><img class="brand-icon" src="/icon.svg" alt="" /> Dictation</div>
+        <div class="header-status"><span id="connectivity" role="status">Checking network…</span><span id="status" role="status">Ready</span></div>
+        <button id="open-settings" class="gear-button" type="button" aria-label="Transcription settings" aria-haspopup="dialog" aria-controls="settings-dialog" title="Transcription settings">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 2h5l.5 2.5 2 1.2 2.4-.8 2.5 4.3-1.9 1.7v2.2l1.9 1.7-2.5 4.3-2.4-.8-2 1.2-.5 2.5h-5L9 19.5l-2-1.2-2.4.8-2.5-4.3L4 13.1v-2.2L2.1 9.2l2.5-4.3 2.4.8L9 4.5Z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+        <button id="sync-notes" type="button" title="Sync notes to GitHub" aria-label="Sync notes to GitHub">Sync</button>
+      </header>
+      <section class="transcript-panel" aria-label="Transcript">
+        <div class="tools"><span>TRANSCRIPT</span><div><button id="copy" type="button" title="Copy timestamp-keyed transcript JSON">Copy</button><button id="share-transcript" type="button" title="Share timestamp-keyed transcript JSON">Share</button><button id="clear" type="button">Clear</button></div></div>
+        <div id="transcript" lang="und" tabindex="0" role="list" aria-label="Timestamped transcript" data-empty="Tap Start to dictate."></div>
+      </section>
+      <p id="notice" role="status"></p>
+      <div id="recovery" hidden><button id="retry" type="button">Retry queue</button><button id="key-settings" type="button">API key</button></div>
+      <footer>
+        <div class="record-controls" role="group" aria-label="Recording controls">
+          <button id="record" type="button" aria-label="Start recording"><span aria-hidden="true">▶</span> Start</button>
+          <button id="pause" type="button" aria-label="Pause recording" hidden>Ⅱ Pause</button>
+          <button id="stop" type="button" aria-label="Stop recording" hidden><span aria-hidden="true">■</span> Stop</button>
+        </div>
+      </footer>
+      <details id="activity-trail" class="activity-panel">
+        <summary id="activity-title">Activity Trail</summary>
+        <ol id="activity-log" role="log" aria-label="Activity log" aria-live="polite" aria-relevant="additions" tabindex="0"></ol>
+      </details>
+      <dialog id="settings-dialog" aria-labelledby="settings-title">
+        <h1 id="settings-title">Transcription settings</h1>
+        <p>Choose automatic detection or set your language and model.</p>
+        <p class="hint">Online audio goes to Groq. Offline audio stays on this Android device. Notes are saved locally; GitHub sync uploads text only.</p>
+        <section id="device-settings">
+          <h2>Offline Whisper</h2>
+          <p id="offline-model-status" role="status">Checking model…</p>
+          <button id="download-model" type="button">Download tiny model (32 MB)</button>
+          <p class="hint">Download once while online, before going offline. Quantized multilingual tiny runs locally; speed and accuracy depend on your device.</p>
+          <h2>GitHub notes repository</h2>
+          <form id="git-form">
+            <label for="git-repository">Existing repository (owner/name, main branch)</label>
+            <input id="git-repository" placeholder="owner/dictation-notes" autocomplete="off" required pattern="[A-Za-z0-9-]+/[A-Za-z0-9_.-]+" />
+            <label for="git-credentials">Import .git_credentials (PAT with Contents: read/write)</label>
+            <input id="git-credentials" type="file" />
+            <p class="hint">Use a private repository. Tokens are encrypted with Android Keystore, never bundled or committed. Unsynced commits survive offline use and app restarts.</p>
+            <button type="submit">Connect repository</button>
+          </form>
+        </section>
+        <div class="transcription-settings">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="auto">Auto-detect language</option>
+            <option value="hi">Hindi (हिन्दी)</option>
+            <option value="en">English</option>
+            <option value="hinglish">Hinglish</option>
+          </select>
+          <label for="model">Model</label>
+          <select id="model">
+            <option value="auto">Auto model</option>
+            <option value="whisper-large-v3-turbo">v3-turbo</option>
+            <option value="whisper-large-v3">v3</option>
+          </select>
+        </div>
+        <p class="hint">Auto model uses turbo for English and v3 for Hindi/Hinglish. Settings are locked while recording or audio is queued.</p>
+        <p id="detection" role="status" hidden></p>
+        <form method="dialog" class="dialog-actions"><button autofocus>Done</button></form>
+      </dialog>
+      <dialog id="key-dialog" aria-labelledby="key-title">
+        <form id="key-form">
+          <h1 id="key-title">Connect to Groq</h1>
+          <p>Enter your API key to start dictating. It is saved only in this browser’s local storage.</p>
+          <label for="api-key">Groq API key</label>
+          <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="gsk_…" required />
+          <p class="hint">Use only on a trusted device. Audio goes directly to Groq; no app server is involved.</p>
+          <div class="dialog-actions"><button id="cancel-key" type="button">Not now</button><button type="submit">Save key</button></div>
+        </form>
+      </dialog>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

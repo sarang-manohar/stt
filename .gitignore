@@ -1,0 +1,10 @@
+node_modules/
+dist/
+dist-android/
+.env*
+!.env.example
+.git_credentials
+android/app/src/main/cpp/vendor/
+*.ggml
+*.gguf
+*.bin

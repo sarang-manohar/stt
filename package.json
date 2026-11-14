@@ -1,0 +1,33 @@
+{
+  "name": "personal-dictation",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "vitest run",
+    "test:browser": "npm run build && node scripts/browser-smoke.mjs",
+    "build:android": "tsc --noEmit && vite build --mode android --outDir dist-android",
+    "android:sync": "npm run build:android && cap sync android",
+    "android:open": "npm run android:sync && cap open android",
+    "android:prepare-whisper": "node scripts/prepare-whisper.mjs",
+    "android:apk": "npm run android:prepare-whisper && npm run android:sync && cd android && ./gradlew assembleDebug",
+    "android:bundle": "npm run android:prepare-whisper && npm run android:sync && cd android && ./gradlew bundleRelease"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.6.10",
+    "@types/node": "^22.10.0",
+    "playwright-core": "^1.65.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.4.1",
+    "vitest": "^4.1.12"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.6.10",
+    "@capacitor/core": "^7.6.10",
+    "@capacitor/filesystem": "^7.1.9",
+    "@capacitor/share": "^7.0.4"
+  }
+}

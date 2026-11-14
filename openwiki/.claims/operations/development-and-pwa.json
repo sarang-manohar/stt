@@ -1,0 +1,130 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:3eb1dd548eb648a734c0852f7b7d57dba0bb361e57e1f5f8b8f7c7359249527c",
+  "claims": [
+    {
+      "id": "claim_c588acbcc2c342859636e15e4938a0b1",
+      "statement": "Browser Vite builds expose the first nonempty trimmed VITE_GROQ_API_KEY or legacy GROQ_API_KEY as the client key expression without exposing every unprefixed environment variable; Android mode always defines that expression as empty, even when either environment key exists.",
+      "evidence": [
+        {
+          "resource": "repo://src/androidBuild.test.ts",
+          "version": "repo-file-v1:sha256:f380e3736a174de29a007d521cb43510f269d9642c7ba4b39bc71f0ee4b27f93"
+        },
+        {
+          "resource": "repo://vite.config.ts",
+          "version": "repo-file-v1:sha256:4945e2ee3ef25e4e7c95abbcfd4d4a12d132afa704886194369ee10efcd02606"
+        }
+      ]
+    },
+    {
+      "id": "claim_2e3029190bc7482aa7c8c91259046ee1",
+      "statement": "Online recording uses a localStorage fallback Groq key when no environment key exists, with a Start/settings HTML dialog and memory fallback for storage failure; Android excludes bundled environment keys, but prepared offline Whisper does not require a Groq key.",
+      "evidence": [
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        },
+        {
+          "resource": "repo://vite.config.ts",
+          "version": "repo-file-v1:sha256:4945e2ee3ef25e4e7c95abbcfd4d4a12d132afa704886194369ee10efcd02606"
+        }
+      ]
+    },
+    {
+      "id": "claim_30f8378de26245edb06cdd9448ef79a1",
+      "statement": "The root-scoped standalone PWA manifest has 192/512 PNG icons; only production browser platforms register its service worker after page load. Native Android loads bundled dist-android assets at a secure localhost origin instead. The UI, PWA and Android launcher share purple wave artwork from public/icon.svg; scripts/generate-icons.mjs regenerates PWA PNGs and legacy/adaptive Android icon resources using ImageMagick convert.",
+      "evidence": [
+        {
+          "resource": "repo://capacitor.config.ts",
+          "version": "repo-file-v1:sha256:211218a39d96d30afe2d4ec3b60c08ba90638731251b2b2ad45753f991504c86"
+        },
+        {
+          "resource": "repo://index.html",
+          "version": "repo-file-v1:sha256:5ce5dd2d9ed074e1dd2ef68e90b3e7f50a8010ebe8194cb76c46949bf3d1ae88"
+        },
+        {
+          "resource": "repo://public/icon.svg",
+          "version": "repo-file-v1:sha256:6eac06e73080d5169a4b45900ffc3838dc253b03675b3c4b5fb0d00afb90190e"
+        },
+        {
+          "resource": "repo://public/manifest.webmanifest",
+          "version": "repo-file-v1:sha256:528968f9322a213b4eda451f693c6cef5150361bf0ae0ef8bbbdcb4ae76d0f41"
+        },
+        {
+          "resource": "repo://scripts/generate-icons.mjs",
+          "version": "repo-file-v1:sha256:d4c0be5b46481da2929128fe62f14909786a182cbde741bb5e0375df8ee98918"
+        },
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        }
+      ]
+    },
+    {
+      "id": "claim_6bef2cf595494e249dc8a15f06dbdf9d",
+      "statement": "The build generates a versioned offline-shell worker; it caches app entry assets and the worklet, does not intercept cross-origin or non-GET traffic, and waits for existing clients to close before activating an update.",
+      "evidence": [
+        {
+          "resource": "repo://public/sw.js",
+          "version": "repo-file-v1:sha256:8cf1697453f026ef7cadb8ca725b1cdbb9e698b393d1a27e04cdf2267b3666c8"
+        },
+        {
+          "resource": "repo://vite.config.ts#L8-L17",
+          "version": "repo-lines-v1:sha256:8042d237389365d56f7af97ae52c460bcccfc9d75b9dd443c5d2f35e27e4f716:eyJzZWxlY3RlZExpbmVDb3VudCI6MTAsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6Ijg4ZDMxMDE4MzQxMTZmOTQ5YWYzOWZjODk3NWJlNzA1ZWJiYTMzMmUxM2Y0MTFlMWI0M2U0YzNlZGViNzU2ODkiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjEyOGZjY2QzYmNiYTliYTIyNjgyZTg3ODQyOTcyMDAxZmVhZDNiODMxNzVkNWZiMTAxODdhZDIxNTA0M2VkYjEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6Ijg5MzFlZTc1OWZlMjBlMTM1Yzg3ZDMxOGYyYTBlZWJmZTkyOWFmMGFlOTMwZDZjNTAzMmRmMzU2MzA4ODU1NTYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImE1ODNmODIyYTc0NzkyNGNhZjYzZjU2MDA1YmFiZDA0NWYwNTJhZDYyYjMxMGRkYzFhOWYwYzdkM2JhMDI2MTAifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_69e55602e1924b848c2631d38186a85e",
+      "statement": "Production browser smoke uses synthetic microphone input and mocked Groq to verify capture/fallback, ordered uploads, automatic routing, timestamped UI/JSON parity including empty values, Copy/Share and Share download fallback, removal of Save and the JSON button, gear focus/busy locks, safe text and offline reload. Landing layout checks cover portrait, 320px narrow and landscape sizes, top-right gear alignment, and default-collapsed Activity Trail with heading/inside/outside taps and Escape. Native export/build-key tests remain mocked rather than device certification.",
+      "evidence": [
+        {
+          "resource": "repo://package.json",
+          "version": "repo-file-v1:sha256:fd201bfbe29a8219b96a6696586f9747e529e5ff9b4c5102e2d3d9de0c97b1bd"
+        },
+        {
+          "resource": "repo://scripts/browser-smoke.mjs",
+          "version": "repo-file-v1:sha256:7f9f088c9f8f797423eb27948f876ef6ea6c8053c7c3eebaa3bf98748a1ede95"
+        },
+        {
+          "resource": "repo://src/androidBuild.test.ts",
+          "version": "repo-file-v1:sha256:f380e3736a174de29a007d521cb43510f269d9642c7ba4b39bc71f0ee4b27f93"
+        },
+        {
+          "resource": "repo://src/exportTranscript.test.ts",
+          "version": "repo-file-v1:sha256:8094409d7a5b3ec5723fb3ba9a6c12cb0026927bddc7e7d6aafa515167fb74b4"
+        }
+      ]
+    },
+    {
+      "id": "claim_95f90ac43d0047cbb8f8a0c57382f4cd",
+      "statement": "Browser environment keys are visible in bundles/offline caches and Android user-entered Groq keys use WebView localStorage; audio/queue are volatile but notes persist automatically. Copy/Share export the shared snapshot; native Share creates a UTF-8 private cache file and the internal save utility uses SAF without broad storage permission. Backup is disabled; device recording, offline inference and GitHub syncing require hardware validation.",
+      "evidence": [
+        {
+          "resource": "repo://README.md",
+          "version": "repo-file-v1:sha256:3bcc36f817a1cfaccc3ea0eb34e651479f3741f91e4616701120008ee316727e"
+        },
+        {
+          "resource": "repo://android/app/src/main/AndroidManifest.xml",
+          "version": "repo-file-v1:sha256:afb0e603073a50fc1c5bda2499830a68f4ee0742ceb0a29055b81e945f1a4b56"
+        },
+        {
+          "resource": "repo://src/exportTranscript.ts",
+          "version": "repo-file-v1:sha256:df1919a6440971622de0db574496af13bd45ca1bb40de269cbd51932fbda21e3"
+        },
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        },
+        {
+          "resource": "repo://vite.config.ts",
+          "version": "repo-file-v1:sha256:4945e2ee3ef25e4e7c95abbcfd4d4a12d132afa704886194369ee10efcd02606"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:28:39.707Z"
+  }
+}

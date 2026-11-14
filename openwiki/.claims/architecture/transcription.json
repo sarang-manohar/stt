@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:51ec8c7a60fd47411aac3051301331822d536cc99e8e3e855ae278327bd5a318",
+  "claims": [
+    {
+      "id": "claim_e0d3fb9c86174a72bcf68c9f410a0380",
+      "statement": "The transcription FIFO keeps the head through optional language/model refinement and synchronously merges text, original chunk and resolved metadata before removing it and starting the next request, whose optional cloud prompt uses up to 200 trailing committed context characters.",
+      "evidence": [
+        {
+          "resource": "repo://src/offlineTranscription.test.ts",
+          "version": "repo-file-v1:sha256:35aabdb1e235fdc3bcdfe1bddd165456386cda96f21d5c302c2dac2780587990"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.test.ts",
+          "version": "repo-file-v1:sha256:f4c5a0dbf2e161ef573bb661aaf2421764f2c4c7833599a6ca41bc3b45f43996"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.ts",
+          "version": "repo-file-v1:sha256:a38ba856e449f3de7aeb960eac7f16f6910aa43cd7a644bba3820d915d967c5b"
+        }
+      ]
+    },
+    {
+      "id": "claim_ac5652bdbab44a4793cd977164f16a52",
+      "statement": "Groq multipart requests use verbose_json, zero temperature, bearer auth and a 30-second per-request deadline; Auto language omits the field, Hindi/Hinglish send hi, and Auto model routes English to turbo and Hindi to v3 with same-head refinement when needed, unless a model is explicitly selected.",
+      "evidence": [
+        {
+          "resource": "repo://src/transcriptionQueue.test.ts",
+          "version": "repo-file-v1:sha256:f4c5a0dbf2e161ef573bb661aaf2421764f2c4c7833599a6ca41bc3b45f43996"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.ts",
+          "version": "repo-file-v1:sha256:a38ba856e449f3de7aeb960eac7f16f6910aa43cd7a644bba3820d915d967c5b"
+        }
+      ]
+    },
+    {
+      "id": "claim_737a12013a9a469a8d86226e390e31e7",
+      "statement": "Unrecovered cloud transient network, timeout, HTTP 408/429 and 5xx failures retain the FIFO head and retry with capped 1/2/4/8/10-second base backoff plus ±200 ms jitter; missing keys, nonretryable HTTP errors and local-engine errors pause without dropping audio, while offline routing can handle a failed upload on the same head.",
+      "evidence": [
+        {
+          "resource": "repo://src/offlineTranscription.test.ts",
+          "version": "repo-file-v1:sha256:35aabdb1e235fdc3bcdfe1bddd165456386cda96f21d5c302c2dac2780587990"
+        },
+        {
+          "resource": "repo://src/transcriptionQueue.ts",
+          "version": "repo-file-v1:sha256:a38ba856e449f3de7aeb960eac7f16f6910aa43cd7a644bba3820d915d967c5b"
+        }
+      ]
+    },
+    {
+      "id": "claim_1453e84e87c443a6adc1c99446192533",
+      "statement": "Stitching preserves NFC-normalized combining marks and uses fifteen-token exact/one-substitution suffix matching plus guarded long-boundary alignment with up to two edits; a separate exact-restart fallback searches the last 32 committed tokens for prefixes of 5–15 tokens ending up to 16 tokens before the tail, requiring three distinct content anchors, rejecting divergent negations and avoiding truncation of longer exact runs.",
+      "evidence": [
+        {
+          "resource": "repo://src/transcriptDocument.test.ts",
+          "version": "repo-file-v1:sha256:27392dd1bd09c73a20e16c0932e9f3ddf3a8df6248ecd8a202a628882bc28afe"
+        },
+        {
+          "resource": "repo://src/transcriptStitcher.test.ts",
+          "version": "repo-file-v1:sha256:18a3c7e2885eb581fb1ea9f89f30561994d5c765c817e31f716e34095170a5b0"
+        },
+        {
+          "resource": "repo://src/transcriptStitcher.ts",
+          "version": "repo-file-v1:sha256:56abef546ae5ff13e1b07881d23a2eea14e8f1064a7fade77e8912e21fc9eec8"
+        }
+      ]
+    },
+    {
+      "id": "claim_bd8f2d39955d4e349f983468c6b22d67",
+      "statement": "The UI renders timestamp/value rows and Copy and Share export the same JSON snapshot including empty values; no Save or separate JSON button remains. Copy works while recording; Share is locked while busy or exporting. Native Share uses a UTF-8 cached file; browser Share uses JSON files or text, falling back to download only without Web Share. Cancellation/failure preserves the transcript. The save utility remains available internally but is not wired to a UI control. The compact viewport-filling landing screen places settings top-right and defaults Activity Trail to collapsed; heading taps toggle it and outside taps or Escape close it. Audio/transcript handling information is in Settings.",
+      "evidence": [
+        {
+          "resource": "repo://index.html",
+          "version": "repo-file-v1:sha256:5ce5dd2d9ed074e1dd2ef68e90b3e7f50a8010ebe8194cb76c46949bf3d1ae88"
+        },
+        {
+          "resource": "repo://scripts/browser-smoke.mjs",
+          "version": "repo-file-v1:sha256:7f9f088c9f8f797423eb27948f876ef6ea6c8053c7c3eebaa3bf98748a1ede95"
+        },
+        {
+          "resource": "repo://src/exportTranscript.ts",
+          "version": "repo-file-v1:sha256:df1919a6440971622de0db574496af13bd45ca1bb40de269cbd51932fbda21e3"
+        },
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        },
+        {
+          "resource": "repo://src/style.css",
+          "version": "repo-file-v1:sha256:90803e1aa8a0849aececdcd8c1312ff43e208c5dbde7a334804a8bcd3228fbe3"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:28:39.707Z"
+  }
+}

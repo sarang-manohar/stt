@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "pageVersion": "sha256:b727af8263981a79e8642e3bf391571158767c92606319aa5be58eee55932f4d",
+  "claims": [
+    {
+      "id": "claim_379cdc4d509149cbb6319b0f9c46f3f9",
+      "statement": "Android connectivity requires INTERNET plus VALIDATED on the active network and publishes native changes; browser status uses navigator.onLine as a hint.",
+      "evidence": [
+        {
+          "resource": "repo://android/app/src/main/java/app/personaldictation/mobile/DictationDevicePlugin.java",
+          "version": "repo-file-v1:sha256:3939c14ac04164105353a6d214b3c9114a96bf4cd74e0102187e6720dbd3b20b"
+        },
+        {
+          "resource": "repo://src/deviceServices.ts",
+          "version": "repo-file-v1:sha256:cf672b57a838db95cf9fbc486d9b75d4a76b47e8965f67c0b3fd76bc6824e2e7"
+        }
+      ]
+    },
+    {
+      "id": "claim_dcae46e685cb4c6f861925ae67a0f19c",
+      "statement": "The Android model download enforces expected size and pinned SHA-256 before installing multilingual tiny q5_1; JNI runs mono 16 kHz WAV inference with a cached CPU context off the UI thread.",
+      "evidence": [
+        {
+          "resource": "repo://android/app/src/main/cpp/whisper-jni.cpp",
+          "version": "repo-file-v1:sha256:0c5e05baa322b72fc2e8e074013e3c81730c13830cfd8e052b4b36cfdf24f2a1"
+        },
+        {
+          "resource": "repo://android/app/src/main/java/app/personaldictation/mobile/DictationDevicePlugin.java",
+          "version": "repo-file-v1:sha256:3939c14ac04164105353a6d214b3c9114a96bf4cd74e0102187e6720dbd3b20b"
+        }
+      ]
+    },
+    {
+      "id": "claim_054d0e8f7ba04cb9b5d6a1e41ca745b3",
+      "statement": "Android notes are device-specific JSON committed in a private Git repository, with shared locking around foreground/background fetch-merge-non-force-push and durable pending retries.",
+      "evidence": [
+        {
+          "resource": "repo://android/app/src/main/java/app/personaldictation/mobile/NotesRepository.java",
+          "version": "repo-file-v1:sha256:dff4b436bf89242cec2ca908aa87baee926fc9dab55d176cc75d933ef4254f4d"
+        },
+        {
+          "resource": "repo://android/app/src/main/java/app/personaldictation/mobile/NotesSyncWorker.java",
+          "version": "repo-file-v1:sha256:96db2fdc90ecfcfc96cfed8bf4c924f328f2f91fda00a1978cee0023313edb2a"
+        }
+      ]
+    },
+    {
+      "id": "claim_0b3519bda97d49e1ad4108b6c563693f",
+      "statement": "GitHub PATs are explicitly imported and encrypted using Android Keystore AES-GCM without token-bearing remote URLs; changing an already linked destination is blocked.",
+      "evidence": [
+        {
+          "resource": "repo://.gitignore",
+          "version": "repo-file-v1:sha256:9c974035dc78ae4aa0ecf52b40f56d2783208261a450d21d64ade5b55e1df816"
+        },
+        {
+          "resource": "repo://android/app/src/main/java/app/personaldictation/mobile/NotesRepository.java",
+          "version": "repo-file-v1:sha256:dff4b436bf89242cec2ca908aa87baee926fc9dab55d176cc75d933ef4254f4d"
+        },
+        {
+          "resource": "repo://src/deviceServices.ts",
+          "version": "repo-file-v1:sha256:cf672b57a838db95cf9fbc486d9b75d4a76b47e8965f67c0b3fd76bc6824e2e7"
+        },
+        {
+          "resource": "repo://src/main.ts",
+          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+        }
+      ]
+    }
+  ],
+  "verification": {
+    "by": "openwiki/0.9.0",
+    "at": "2026-11-14T14:28:39.707Z"
+  }
+}
