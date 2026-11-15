@@ -1,0 +1,68 @@
+diff --git a/ggml/src/ggml-vulkan/ggml-vulkan.cpp b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+--- a/ggml/src/ggml-vulkan/ggml-vulkan.cpp
++++ b/ggml/src/ggml-vulkan/ggml-vulkan.cpp
+@@ -5,8 +5,11 @@
+ #include "ggml-cpu.h"
+ #endif
+ 
++#define VULKAN_HPP_DISPATCH_LOADER_DYNAMIC 1
+ #include <vulkan/vulkan.hpp>
+ 
++VULKAN_HPP_DEFAULT_DISPATCH_LOADER_DYNAMIC_STORAGE
++
+ #include <algorithm>
+ #include <cmath>
+ #include <iomanip>
+@@ -3098,7 +3101,7 @@ static vk_device ggml_vk_get_device(size_t idx) {
+             device_extensions.push_back("VK_KHR_shader_integer_dot_product");
+         }
+ 
+-        vkGetPhysicalDeviceFeatures2(device->physical_device, &device_features2);
++        VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(device->physical_device, &device_features2);
+ 
+         device->fp16 = device->fp16 && vk12_features.shaderFloat16;
+ 
+@@ -3528,7 +3531,7 @@ static void ggml_vk_print_gpu_info(size_t idx) {
+         last_struct = (VkBaseOutStructure *)&shader_integer_dot_product_features;
+     }
+ 
+-    vkGetPhysicalDeviceFeatures2(physical_device, &device_features2);
++    VULKAN_HPP_DEFAULT_DISPATCHER.vkGetPhysicalDeviceFeatures2(physical_device, &device_features2);
+ 
+     fp16 = fp16 && vk12_features.shaderFloat16;
+ 
+@@ -3567,11 +3570,14 @@ static void ggml_vk_instance_init() {
+     }
+     VK_LOG_DEBUG("ggml_vk_instance_init()");
+ 
++    VULKAN_HPP_DEFAULT_DISPATCHER.init(vkGetInstanceProcAddr);
++    if (!VULKAN_HPP_DEFAULT_DISPATCHER.vkEnumerateInstanceVersion) {
++        throw std::runtime_error("Vulkan 1.2 required");
++    }
+     uint32_t api_version = vk::enumerateInstanceVersion();
+ 
+     if (api_version < VK_API_VERSION_1_2) {
+-        std::cerr << "ggml_vulkan: Error: Vulkan 1.2 required." << std::endl;
+-        GGML_ABORT("fatal error");
++        throw std::runtime_error("Vulkan 1.2 required");
+     }
+ 
+     vk::ApplicationInfo app_info{ "ggml-vulkan", 1, nullptr, 0, api_version };
+@@ -3617,6 +3623,7 @@ static void ggml_vk_instance_init() {
+         GGML_LOG_DEBUG("ggml_vulkan: Validation layers enabled\n");
+     }
+     vk_instance.instance = vk::createInstance(instance_create_info);
++    VULKAN_HPP_DEFAULT_DISPATCHER.init(vk_instance.instance);
+     vk_instance_initialized = true;
+ 
+     vk_perf_logger_enabled = getenv("GGML_VK_PERF_LOGGER") != nullptr;
+@@ -10306,6 +10313,9 @@ ggml_backend_reg_t ggml_backend_vk_reg() {
+     } catch (const vk::SystemError& e) {
+         VK_LOG_DEBUG("ggml_backend_vk_reg() -> Error: System error: " << e.what());
+         return nullptr;
++    } catch (const std::runtime_error& e) {
++        GGML_LOG_ERROR("ggml_vulkan: %s\n", e.what());
++        return nullptr;
+     }
+ }
+ 

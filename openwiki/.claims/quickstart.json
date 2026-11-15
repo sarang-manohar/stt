@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:eb919e2e32cf764ef94791f4d97f0b252531d3cb0efe7bf41f10995ec85d9059",
+  "pageVersion": "sha256:189e4512ac3f370cec434f29d4a851162f8fd1a1058a4247bc0022faa644cb96",
   "claims": [
     {
       "id": "claim_367c1d0be2bf413fae6647742fa2969c",
@@ -8,11 +8,11 @@
       "evidence": [
         {
           "resource": "repo://index.html",
-          "version": "repo-file-v1:sha256:5ce5dd2d9ed074e1dd2ef68e90b3e7f50a8010ebe8194cb76c46949bf3d1ae88"
+          "version": "repo-file-v1:sha256:5144b3f279d082ba3ac7404df690de7c9cdeed01e9f306df895a68ef228a36f7"
         },
         {
           "resource": "repo://src/deviceServices.ts",
-          "version": "repo-file-v1:sha256:cf672b57a838db95cf9fbc486d9b75d4a76b47e8965f67c0b3fd76bc6824e2e7"
+          "version": "repo-file-v1:sha256:cef91cbacb65d9dc33104c0df7246bca511a61b91744fe82d3a89251b6adc621"
         },
         {
           "resource": "repo://src/exportTranscript.ts",
@@ -20,7 +20,7 @@
         },
         {
           "resource": "repo://src/main.ts",
-          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+          "version": "repo-file-v1:sha256:7e2777438eeb363807761d0d89f5bb9bd3b1e2b442f2535341dd9c2275d598fc"
         },
         {
           "resource": "repo://src/transcriptDocument.ts",
@@ -38,11 +38,11 @@
       "evidence": [
         {
           "resource": "repo://.github/workflows/android.yml",
-          "version": "repo-file-v1:sha256:acb8cea1cc86dd33303d0d76332c38b5cac66c9beb8a456e225fc8d21b4a2426"
+          "version": "repo-file-v1:sha256:5fe07b98ea2e1a9220160e30e397d90dea0478f85a66fe2fde8606389b3d5e50"
         },
         {
           "resource": "repo://README.md",
-          "version": "repo-file-v1:sha256:3bcc36f817a1cfaccc3ea0eb34e651479f3741f91e4616701120008ee316727e"
+          "version": "repo-file-v1:sha256:9ec573d8921074741cad77c047221fcf84778ed8d614488b77d51f5d2453173b"
         },
         {
           "resource": "repo://package.json",
@@ -68,13 +68,27 @@
         },
         {
           "resource": "repo://src/transcriptionQueue.ts",
-          "version": "repo-file-v1:sha256:a38ba856e449f3de7aeb960eac7f16f6910aa43cd7a644bba3820d915d967c5b"
+          "version": "repo-file-v1:sha256:e4483ba53fc6eaf3a36fedd09049e509fd05ad758ab158bee72d72c78cb31dd0"
+        }
+      ]
+    },
+    {
+      "id": "claim_b0f492321c3d4c2181efaa28aa13254b",
+      "statement": "Android debug builds default to Vulkan, while setting dictationVulkan=false selects CPU-only; CI publishes separate APK artifacts for both modes.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/android.yml#L37-L104",
+          "version": "repo-lines-v1:sha256:8a5eede5c47947c56325585fadece8eae8a2c824bb8d483df8efa48459fcfedd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ZDRiYmE2M2E1Yjg0MjZiNjRjZjJhMjIyZDE4MzkyY2U4MGU2ZDcwMWI4Mzk0OGY0NmRlNGM1ZDdhZmQ0ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2NmQwNGZhNzkyMDQxYWEwNGMxY2ZmYjZkN2IxNWFkYTc1N2UxZGU4OTFlNDY2MzFmYmZmYzU2YTFhZThmNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjZGRhZTRlN2E2MzZjMjBmNTUwYWNiNmE1NGYyNzA5YWUyY2I0Y2RhNDE1ZDNhN2U1MjQxZTM3MTg1Njg5MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        },
+        {
+          "resource": "repo://android/app/build.gradle#L3-L36",
+          "version": "repo-lines-v1:sha256:493116097dee9ac0cb4fda83f98dbcb3a08179b91c556518d614ba2ae95b5fea:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzFjMWFiOGI5NTM1ZmI3NzlhZWNjZmE0NTA4ODk2OTdkNmY4MjA0NWViZmFhZjQ2OWM2NTEwNDFlZTY1NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNWIxYTg5YzE0MTk5MDNiZTExMjIwNzQxMTVkZWNhNGJmNjJkMjQxMDBkMzFmZmQyMGZjYzkzMTNmNzg5ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5NTU4Njg4ZDczMjBhNjM3ZjY3MDAyZTNlYmY0NmQxNzI5MDQxZTEzMjYyMjJlYzdlMmNjYzM3NGQ2MDY2OTUifQ"
         }
       ]
     }
   ],
   "verification": {
     "by": "openwiki/0.9.0",
-    "at": "2026-11-14T14:28:39.707Z"
+    "at": "2026-11-15T17:00:09.797Z"
   }
 }

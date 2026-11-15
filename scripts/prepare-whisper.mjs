@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 const revision = 'a8d002cfd879315632a579e73f0148d06959de36'; // whisper.cpp v1.7.6 (MIT)
@@ -12,4 +12,11 @@ if (!existsSync(directory)) {
 }
 const head = execFileSync('git', ['-C', directory, 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
 if (head !== revision) throw new Error('Unexpected whisper.cpp revision; remove vendor/whisper.cpp and retry.');
+const patch = resolve('scripts/whisper-vulkan-dispatch.patch');
+const alreadyApplied = spawnSync('git', ['-C', directory, 'apply', '--reverse', '--check', patch]);
+if (alreadyApplied.error) throw alreadyApplied.error;
+if (alreadyApplied.status !== 0) {
+  execFileSync('git', ['-C', directory, 'apply', '--check', patch], { stdio: 'inherit' });
+  execFileSync('git', ['-C', directory, 'apply', patch], { stdio: 'inherit' });
+}
 console.log(`Whisper source ready: ${revision}`);

@@ -13,6 +13,7 @@ on:
       - 'capacitor.config.ts'
       - 'vite.config.ts'
       - 'tsconfig.json'
+      - 'scripts/**'
       - '.npmrc'
       - '.github/workflows/android.yml'
   pull_request:
@@ -25,6 +26,7 @@ on:
       - 'capacitor.config.ts'
       - 'vite.config.ts'
       - 'tsconfig.json'
+      - 'scripts/**'
       - '.npmrc'
       - '.github/workflows/android.yml'
 
@@ -34,7 +36,17 @@ permissions:
 jobs:
   apk:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mode: cpu
+            vulkan: 'false'
+          - mode: vulkan
+            vulkan: 'true'
+    env:
+      ORG_GRADLE_PROJECT_dictationVulkan: ${{ matrix.vulkan }}
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -48,15 +60,45 @@ jobs:
       - uses: android-actions/setup-android@v3
       - name: Install Android SDK packages
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'ndk;27.2.12479018' 'cmake;3.22.1'
+      - name: Set up isolated Vulkan toolchain
+        if: matrix.mode == 'vulkan'
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: dictation-vulkan
+          auto-activate-base: false
+          channels: conda-forge
+          channel-priority: strict
       - name: Install Vulkan build tools
-        run: sudo apt-get update && sudo apt-get install -y libvulkan-dev glslc build-essential ninja-build
+        if: matrix.mode == 'vulkan'
+        shell: bash -el {0}
+        run: conda install -y -c conda-forge 'shaderc=2025.5' 'libvulkan-headers=1.4.313.0'
       - run: npm ci
       - run: npm test
+      - run: npm run android:prepare-whisper
+        if: matrix.mode == 'cpu'
+      - name: Android unit tests
+        run: cd android && ./gradlew testDebugUnitTest
+        if: matrix.mode == 'cpu'
       - name: Build debug APK (no embedded API key)
-        run: npm run android:apk
+        shell: bash -el {0}
+        run: |
+          if [ "${{ matrix.mode }}" = vulkan ]; then
+            export ORG_GRADLE_PROJECT_dictationGlslc="$CONDA_PREFIX/bin/glslc"
+            export ORG_GRADLE_PROJECT_dictationVulkanHeaders="$CONDA_PREFIX/include"
+          fi
+          npm run android:apk
+          for abi in arm64-v8a x86_64; do
+            unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -q "lib/$abi/libggml-cpu.so"
+            if [ "${{ matrix.mode }}" = vulkan ]; then
+              unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -q "lib/$abi/libggml-vulkan.so"
+            elif unzip -l android/app/build/outputs/apk/debug/app-debug.apk | grep -q "lib/$abi/libggml-vulkan.so"; then
+              echo "Unexpected Vulkan library in CPU build" >&2
+              exit 1
+            fi
+          done
       - uses: actions/upload-artifact@v4
         with:
-          name: dictation-android-debug
+          name: dictation-android-${{ matrix.mode }}-debug
           path: android/app/build/outputs/apk/debug/app-debug.apk
           if-no-files-found: error
           retention-days: 14

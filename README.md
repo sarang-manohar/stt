@@ -32,22 +32,37 @@ The checked-in [`android/`](android/) project packages the same UI and audio pip
 
 ### Build and install
 
-Requirements: Node.js 22.12+, **JDK 21**, Android SDK **Platform 35**, **Build Tools 35.0.0**, **NDK 27.2.12479018**, **CMake 3.22.1**, system Vulkan development headers, `glslc`, a host C/C++ compiler and Ninja on `PATH` for Vulkan shader generation, and an up-to-date Android System WebView/Chrome on the phone. On Debian/Ubuntu, install the host prerequisites with `sudo apt-get install libvulkan-dev vulkan-tools glslc build-essential ninja-build`. CMake uses system headers/tools but links each Android ABI against the NDK Vulkan stub, not the host Vulkan library. The native minimum is Android 6 (API 23); Vulkan requires Android 7 (API 24) or later and a compatible driver. Old devices also require a current WebView; validate your target phone.
+Both modes require Node.js 22.12+, **JDK 21**, Android SDK **Platform 35**, **Build Tools 35.0.0**, **NDK 27.2.12479018** and **CMake 3.22.1**. GPU builds also require a host C/C++ compiler, Ninja, Vulkan C++ headers and a compatible `glslc`; CPU-only builds do not. Use an up-to-date Android System WebView/Chrome on the phone.
+
+The GPU build was compiled on Linux x86-64 with GCC/G++ 12.2, CMake 3.22.1, Ninja 1.10.2, conda-forge `shaderc=2025.5` (`glslc --version` reports shaderc v2023.8), and `libvulkan-headers=1.4.313.0`. For example, with Conda and a working host compiler and Ninja already installed:
+
+```sh
+conda create -y -p "$HOME/dictation-vulkan-tools" --override-channels -c conda-forge \
+  'shaderc=2025.5' 'libvulkan-headers=1.4.313.0'
+export ORG_GRADLE_PROJECT_dictationGlslc="$HOME/dictation-vulkan-tools/bin/glslc"
+export ORG_GRADLE_PROJECT_dictationVulkanHeaders="$HOME/dictation-vulkan-tools/include"
+```
+
+The host compiler and Ninja must be on `PATH`; Debian/Ubuntu users can install them with `sudo apt-get install build-essential ninja-build`. The optional Gradle properties `dictationHostC` and `dictationHostCxx` select absolute host compiler paths. CMake copies Vulkan headers separately from host libc headers and links the optional backend against the Android NDK Vulkan stub, not the host Vulkan library. The app supports Android 6 (API 23); the Vulkan backend requires a compatible Vulkan 1.2 driver and otherwise should use CPU. Actual driver compatibility must be verified on each device.
 
 Set `ANDROID_HOME` to your SDK directory (commonly `$HOME/Android/Sdk` on Linux), or set `sdk.dir=/absolute/path/to/Android/Sdk` in the ignored `android/local.properties`. Then:
 
 ```sh
 npm ci
-npm run android:apk
+# GPU-enabled (default); set the Vulkan tool paths above first.
+ORG_GRADLE_PROJECT_dictationVulkan=true npm run android:apk
 # APK: android/app/build/outputs/apk/debug/app-debug.apk
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+
+# CPU-only; no Vulkan headers or shader compiler required.
+ORG_GRADLE_PROJECT_dictationVulkan=false npm run android:apk
 ```
 
-Alternatively, copy the APK to your phone, open it and allow installation from that source when Android prompts. This is a **debug-signed APK for personal testing**, not a Play Store release. A debug APK can replace an earlier build only when signed with the same debug key; GitHub-hosted CI builds may have different keys. Uninstalling to resolve a signature conflict clears the app's saved settings/key.
+The two builds write to the same output path; copy or rename the first APK before building the other. Alternatively, copy the APK to your phone, open it and allow installation from that source when Android prompts. This is a **debug-signed APK for personal testing**, not a Play Store release. A debug APK can replace an earlier build only when signed with the same debug key; GitHub-hosted CI builds may have different keys. Uninstalling to resolve a signature conflict clears the app's saved settings/key.
 
 For Android Studio, run `npm run android:prepare-whisper` then `npm run android:open`. After web source or plugin changes, run `npm run android:sync` to rebuild `dist-android/` and copy assets/update native plugin registration. `android:apk` and `android:bundle` already do this. `dist/` remains the independent browser/PWA output.
 
-Without a local SDK, run the **Android APK** workflow in GitHub Actions and download the `dictation-android-debug` artifact from the completed run. The workflow also runs on relevant pull requests and pushes to `main`/`master`. Unzip the artifact to get `app-debug.apk`.
+Without a local SDK, run the **Android APK** workflow in GitHub Actions and download the `dictation-android-cpu-debug` or `dictation-android-vulkan-debug` artifact from the completed run. The workflow also runs on relevant pull requests and pushes to `main`/`master`. Unzip the artifact to get `app-debug.apk`.
 
 ### On the phone
 

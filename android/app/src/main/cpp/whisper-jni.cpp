@@ -59,9 +59,11 @@ Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv
             if (!ggml_backend_load((base + "/libggml-cpu.so").c_str())) {
                 fail(env, "Cannot load offline CPU backend."); return nullptr;
             }
+#if defined(DICTATION_VULKAN)
             if (!ggml_backend_load((base + "/libggml-vulkan.so").c_str())) {
                 __android_log_print(ANDROID_LOG_INFO, "dictation-whisper", "Vulkan unavailable; using CPU.");
             }
+#endif
             backends_loaded = true;
         }
         const char *filename = env->GetStringUTFChars(path, nullptr);

@@ -5,10 +5,12 @@ description: Maintainer routing for Android packaging and web PWA dictation, aut
 tags: [quickstart, architecture, dictation, pwa, android]
 verified:
   - by: openwiki/0.9.0
-    at: 2026-11-14T14:28:39.707Z
+    at: 2026-11-15T17:00:09.797Z
 sources:
   - id: openwiki-source-4e3e538728489e7a1208c697
     resource: repo://.github/workflows/android.yml
+  - id: openwiki-source-c2285fe9fbba68070682bc2f
+    resource: repo://android/app/build.gradle
   - id: openwiki-source-f8d10828394c4129061d5b0e
     resource: repo://index.html
   - id: openwiki-source-5b54a58d1b51cd490b0e7162
@@ -33,7 +35,7 @@ sources:
     resource: repo://src/transcriptionQueue.ts
   - id: openwiki-source-8f984b8561327b69df85a229
     resource: repo://src/transcriptView.ts
-generated: { by: "pi", at: "2026-11-14T14:28:39.707Z" }
+generated: { by: "copilot", at: "2026-11-15T17:00:09.797Z" }
 ---
 
 # Dictation architecture and task routing
@@ -60,7 +62,7 @@ The existing `.env.local` is preserved. `VITE_GROQ_API_KEY` is preferred; legacy
 
 `npm test` covers audio, WAV, queues, documents, activity logging, native/browser exports and Android key-exclusion cases, including Hindi/Hinglish overlaps, NFC/matra preservation, model detection/refinement, language multipart fields and timestamp-keyed JSON contributions. `npm run test:browser` requires installed Chrome (`CHROME_PATH` override) and checks the production app with a fake microphone and mocked Groq uploads, including a forced fallback capture path, offline shell, persisted language/model selectors, prompt isolation after language changes, Auto English/Hindi model routing, timestamped UI/JSON parity, empty rows, safe Hindi/HTML-like text rendering and 320px layout. The unified JSON export update passed 76 unit tests, strict web/Android builds including a debug APK, and both browser smoke capture paths. The smoke suite also covers gear-dialog visibility/dismissal/focus restoration, busy locks, JSON Copy/Share parity, removal of Save and the JSON button and Share download fallback. Landing checks cover portrait/narrow/landscape workspace sizing, top-right settings, and default-collapsed Activity Trail with heading/inside/outside taps and Escape dismissal. These checks do not certify physical Android hardware, real Groq interoperability or transcription quality. See [development, security and PWA operations](operations/development-and-pwa.md) for full commands and device checks.
 
-For a debug APK, install JDK 21 plus Android SDK Platform 35/Build Tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1, set `ANDROID_HOME`, and run `npm run android:apk`. Install `android/app/build/outputs/apk/debug/app-debug.apk` with `adb install -r`, or transfer/open it on the phone. `npm run android:open` syncs assets and opens Android Studio; `android:bundle` produces an unsigned release AAB needing release signing. The Android APK GitHub workflow publishes a downloadable debug artifact. See [packaged Android operations](operations/development-and-pwa.md#packaged-android-app) for permissions, signing, key/cache security and device checks.
+For a debug APK, install JDK 21 plus Android SDK Platform 35/Build Tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1, and set `ANDROID_HOME`. The default `npm run android:apk` enables Vulkan and also needs host C/C++ compilers, Ninja, compatible `glslc` and Vulkan headers; set `ORG_GRADLE_PROJECT_dictationVulkan=false` for a CPU-only build without Vulkan tools. Both write `android/app/build/outputs/apk/debug/app-debug.apk`, so copy the first before building the other. Install with `adb install -r`, or transfer/open the APK on the phone. `npm run android:open` syncs assets and opens Android Studio; `android:bundle` produces an unsigned release AAB needing release signing. The Android APK workflow publishes separate CPU and Vulkan debug artifacts. See [packaged Android operations](operations/development-and-pwa.md#packaged-android-app) for toolchain, permissions, signing and device checks.
 
 ## Runtime map
 
@@ -127,6 +129,6 @@ Open Settings while online and download the verified 32 MB multilingual tiny q5_
 
 Create a dedicated private GitHub repository on `main`, grant a repository-scoped PAT Contents read/write, then import `.git_credentials` and enter `owner/repository` in Settings. The build never consumes developer credentials. Every changed native snapshot commits `notes/<device-uuid>.json` locally and schedules background retry; Sync is available at the header right edge when Ready. Fetch/merge/non-force-push preserves rejected/conflicting commits for recovery, and pending state survives restarts. Other devices' files are not displayed and no in-app merge resolver exists. See [native ownership and limitations](architecture/device-services.md).
 
-The implementation passes 93 app unit tests, both browser smoke paths and full ARM64/x86-64 debug APK compilation. Instrumentation sources compile but no connected device was available; actual local inference, GitHub auth/push and background connectivity behavior remain device-verification gaps.
+The CPU and Vulkan debug APKs were built for ARM64 and x86-64; the Vulkan build installed and launched on Waydroid without clearing data, and Settings reported an existing verified model. Actual local inference, GPU use and CPU fallback on Waydroid and the target phones, as well as GitHub auth/push and background connectivity behavior, remain device-verification gaps.
 
 When modifying these contracts, update relevant tests, README operational guidance and the corresponding wiki pages/Claims together. Generated indexes, provenance and Claim metadata are owned by the OpenWiki lifecycle rather than edited by hand.

@@ -8,28 +8,30 @@
       "completedRunId": "73ef2433-ef8d-43ad-870e-5b86ba8e3dd4"
     },
     "/openwiki/architecture/device-services.md": {
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39",
       "pageVersion": "sha256:b727af8263981a79e8642e3bf391571158767c92606319aa5be58eee55932f4d",
       "completedBy": "pi",
-      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
-      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765"
     },
     "/openwiki/architecture/transcription.md": {
+      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39",
       "pageVersion": "sha256:51ec8c7a60fd47411aac3051301331822d536cc99e8e3e855ae278327bd5a318",
       "completedBy": "pi",
-      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
-      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765"
     },
     "/openwiki/operations/development-and-pwa.md": {
-      "pageVersion": "sha256:3eb1dd548eb648a734c0852f7b7d57dba0bb361e57e1f5f8b8f7c7359249527c",
-      "completedBy": "pi",
-      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
-      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+      "pageVersion": "sha256:add97d3f2a2d0a9f3ce8facf3f69be696c10637e90a69fb7a9793df016356f02",
+      "completedBy": "copilot",
+      "completedRunId": "51dd1c04-5b55-4802-aff4-816d39e10065",
+      "gitHead": "7aaaf4e037ea0b24f1e86d4050e3c607cdecdaa5",
+      "sourceFingerprint": "sha256:66576819a35a52c6822f630593143c0528a90a58578ed994eb450654c9854f49"
     },
     "/openwiki/quickstart.md": {
-      "pageVersion": "sha256:eb919e2e32cf764ef94791f4d97f0b252531d3cb0efe7bf41f10995ec85d9059",
-      "completedBy": "pi",
-      "completedRunId": "c33a085a-9e93-45e7-bf43-b05a3cfab765",
-      "sourceFingerprint": "sha256:cf7482b6141f226099329d419141b0a5ce1391b62655eec1196e4c1da2098f39"
+      "pageVersion": "sha256:189e4512ac3f370cec434f29d4a851162f8fd1a1058a4247bc0022faa644cb96",
+      "completedBy": "copilot",
+      "completedRunId": "51dd1c04-5b55-4802-aff4-816d39e10065",
+      "gitHead": "7aaaf4e037ea0b24f1e86d4050e3c607cdecdaa5",
+      "sourceFingerprint": "sha256:66576819a35a52c6822f630593143c0528a90a58578ed994eb450654c9854f49"
     }
   }
 }

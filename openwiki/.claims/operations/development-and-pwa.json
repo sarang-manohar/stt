@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "pageVersion": "sha256:3eb1dd548eb648a734c0852f7b7d57dba0bb361e57e1f5f8b8f7c7359249527c",
+  "pageVersion": "sha256:add97d3f2a2d0a9f3ce8facf3f69be696c10637e90a69fb7a9793df016356f02",
   "claims": [
     {
       "id": "claim_c588acbcc2c342859636e15e4938a0b1",
@@ -22,7 +22,7 @@
       "evidence": [
         {
           "resource": "repo://src/main.ts",
-          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+          "version": "repo-file-v1:sha256:7e2777438eeb363807761d0d89f5bb9bd3b1e2b442f2535341dd9c2275d598fc"
         },
         {
           "resource": "repo://vite.config.ts",
@@ -40,7 +40,7 @@
         },
         {
           "resource": "repo://index.html",
-          "version": "repo-file-v1:sha256:5ce5dd2d9ed074e1dd2ef68e90b3e7f50a8010ebe8194cb76c46949bf3d1ae88"
+          "version": "repo-file-v1:sha256:5144b3f279d082ba3ac7404df690de7c9cdeed01e9f306df895a68ef228a36f7"
         },
         {
           "resource": "repo://public/icon.svg",
@@ -56,7 +56,7 @@
         },
         {
           "resource": "repo://src/main.ts",
-          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+          "version": "repo-file-v1:sha256:7e2777438eeb363807761d0d89f5bb9bd3b1e2b442f2535341dd9c2275d598fc"
         }
       ]
     },
@@ -102,7 +102,7 @@
       "evidence": [
         {
           "resource": "repo://README.md",
-          "version": "repo-file-v1:sha256:3bcc36f817a1cfaccc3ea0eb34e651479f3741f91e4616701120008ee316727e"
+          "version": "repo-file-v1:sha256:9ec573d8921074741cad77c047221fcf84778ed8d614488b77d51f5d2453173b"
         },
         {
           "resource": "repo://android/app/src/main/AndroidManifest.xml",
@@ -114,17 +114,45 @@
         },
         {
           "resource": "repo://src/main.ts",
-          "version": "repo-file-v1:sha256:6f44dedf5781c91262eea99fd6cc2578050ac7264cc739b20e6cb50b27d979e6"
+          "version": "repo-file-v1:sha256:7e2777438eeb363807761d0d89f5bb9bd3b1e2b442f2535341dd9c2275d598fc"
         },
         {
           "resource": "repo://vite.config.ts",
           "version": "repo-file-v1:sha256:4945e2ee3ef25e4e7c95abbcfd4d4a12d132afa704886194369ee10efcd02606"
         }
       ]
+    },
+    {
+      "id": "claim_ea6deb627cb94232b19f50c464d86240",
+      "statement": "Android builds default to Vulkan but can disable it with dictationVulkan=false; only Vulkan builds require host shader tools and Vulkan headers, and prepare-whisper applies the pinned dynamic-dispatch patch.",
+      "evidence": [
+        {
+          "resource": "repo://android/app/build.gradle#L3-L36",
+          "version": "repo-lines-v1:sha256:493116097dee9ac0cb4fda83f98dbcb3a08179b91c556518d614ba2ae95b5fea:eyJzZWxlY3RlZExpbmVDb3VudCI6MzQsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjVhYzFjMWFiOGI5NTM1ZmI3NzlhZWNjZmE0NTA4ODk2OTdkNmY4MjA0NWViZmFhZjQ2OWM2NTEwNDFlZTY1NTgiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MjJjNDJjZDE5YzZkMDNkODA4YzQ1MjcyMDU1MjgyNWI3ZWExYzViNDkxYjIxODUxMWNhYzc0MTVjZjlkOWIiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjoyLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjRjNWIxYTg5YzE0MTk5MDNiZTExMjIwNzQxMTVkZWNhNGJmNjJkMjQxMDBkMzFmZmQyMGZjYzkzMTNmNzg5ZWUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6IjM5NTU4Njg4ZDczMjBhNjM3ZjY3MDAyZTNlYmY0NmQxNzI5MDQxZTEzMjYyMjJlYzdlMmNjYzM3NGQ2MDY2OTUifQ"
+        },
+        {
+          "resource": "repo://android/app/src/main/cpp/CMakeLists.txt#L12-L38",
+          "version": "repo-lines-v1:sha256:74859b729cafd535cecd0dbc53ad3630550b84e3cc5a1423320fce2d4015d52a:eyJzZWxlY3RlZExpbmVDb3VudCI6MjcsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjU1MDVmZmUwYTk5YzdmY2ZiNGMzNDIyNzEyZDM3OTA0YzgyZmE3YzljNmU5MmNhOTQ4OTBkMTY2M2IzMjM0MmUiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjUzZDI1ZDVkZDYzOTBmMWMyYzNlNDJlNGUyYTg3NDFjOWUxNWQ0NzA2YTZmZTY1NWU1YzhjYmIyMzBmYzYzOWYiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjU5OTcwNDg2YWU2NDM2YzhhMjE3OTgzMzQ3ZmEwYmI5ZmIwZmY1MGJjYTNlZWM0MWNhMDllZDc0YjJmZTQwYmUiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjozLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZjM2ZlODE3Njc4ODZjNDZkNjQxMWQ5YTM1MGQ2NDljMzU5YTg5ZmI3OWUyMTQyYWE5Yjc1NTJiYTIyM2VmODAifQ"
+        },
+        {
+          "resource": "repo://scripts/prepare-whisper.mjs#L4-L21",
+          "version": "repo-lines-v1:sha256:a892844ef8dbdcc5da57097e59da48297447da8457527d3948fbbc97c8d5c739:eyJzZWxlY3RlZExpbmVDb3VudCI6MTgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6ImVhZTZlNjJiMGRjZTEwNGExNTQ1MjgyNmRjNTA4YmUwN2JkMThiYWU1YzA3MDlmNzNkMTZhYWIxYjc5NmVlNjYiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6IjQxMmNhMzQ1Y2NmNzViZjljMDgwNmJjZTY5NWJlOGRlODA4Yjc5OTg0MjUxYTdhNTRkMjAyY2Y2MTAxZGQ0NTEiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjY4Y2IyMWM4NmJjYWJhMjAxMmQ3ZGNhOGMwYmVhOGExMTc2ZTgxYjE0MTY1Yjg2YWEzYzkzYTJhN2NkNjg4YzYiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjoxLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImZlYzhkZWI4ZWQxNDNkOTAyM2ZlZDg0ODAxYzc4ZmMzZjUxYjAxOGUyZjk3MGM1NDIyNDU3NTUxMjg3NmZjMzcifQ"
+        }
+      ]
+    },
+    {
+      "id": "claim_49648c64b4a94fe38ceaae202de47fb4",
+      "statement": "The Android CI matrix builds CPU and Vulkan APKs, checks packaged native backend libraries for both ABIs, and uploads separate artifacts.",
+      "evidence": [
+        {
+          "resource": "repo://.github/workflows/android.yml#L37-L104",
+          "version": "repo-lines-v1:sha256:8a5eede5c47947c56325585fadece8eae8a2c824bb8d483df8efa48459fcfedd:eyJzZWxlY3RlZExpbmVDb3VudCI6NjgsImZpcnN0U2VsZWN0ZWRMaW5lSGFzaCI6IjM0ZDRiYmE2M2E1Yjg0MjZiNjRjZjJhMjIyZDE4MzkyY2U4MGU2ZDcwMWI4Mzk0OGY0NmRlNGM1ZDdhZmQ0ZWEiLCJsYXN0U2VsZWN0ZWRMaW5lSGFzaCI6ImE2NmQwNGZhNzkyMDQxYWEwNGMxY2ZmYjZkN2IxNWFkYTc1N2UxZGU4OTFlNDY2MzFmYmZmYzU2YTFhZThmNjkiLCJwcmVjZWRpbmdDb250ZXh0TGluZUNvdW50IjozLCJwcmVjZWRpbmdDb250ZXh0SGFzaCI6IjJjZGRhZTRlN2E2MzZjMjBmNTUwYWNiNmE1NGYyNzA5YWUyY2I0Y2RhNDE1ZDNhN2U1MjQxZTM3MTg1Njg5MjAiLCJmb2xsb3dpbmdDb250ZXh0TGluZUNvdW50IjowLCJmb2xsb3dpbmdDb250ZXh0SGFzaCI6ImUzYjBjNDQyOThmYzFjMTQ5YWZiZjRjODk5NmZiOTI0MjdhZTQxZTQ2NDliOTM0Y2E0OTU5OTFiNzg1MmI4NTUifQ"
+        }
+      ]
     }
   ],
   "verification": {
     "by": "openwiki/0.9.0",
-    "at": "2026-11-14T14:28:39.707Z"
+    "at": "2026-11-15T17:00:09.797Z"
   }
 }

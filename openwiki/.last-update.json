@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-11-14T14:34:28.982Z",
+  "updatedAt": "2026-11-15T17:04:37.675Z",
   "command": "update",
-  "model": "host-agent/pi",
-  "status": "complete",
+  "model": "host-agent/copilot",
+  "status": "interrupted",
   "language": "en"
 }

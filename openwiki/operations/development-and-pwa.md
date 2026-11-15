@@ -5,10 +5,16 @@ description: Separate PWA and packaged Android builds, key exclusion, native sha
 tags: [configuration, security, pwa, android, deployment, testing]
 verified:
   - by: openwiki/0.9.0
-    at: 2026-11-14T14:28:39.707Z
+    at: 2026-11-15T17:00:09.797Z
 sources:
+  - id: openwiki-source-4e3e538728489e7a1208c697
+    resource: repo://.github/workflows/android.yml
+  - id: openwiki-source-c2285fe9fbba68070682bc2f
+    resource: repo://android/app/build.gradle
   - id: openwiki-source-b849f76e187ecb8ae7a3ed77
     resource: repo://android/app/src/main/AndroidManifest.xml
+  - id: openwiki-source-29387847898568100b5b06cc
+    resource: repo://android/app/src/main/cpp/CMakeLists.txt
   - id: openwiki-source-7f3c3e3c401e7be9b6c6d723
     resource: repo://capacitor.config.ts
   - id: openwiki-source-f8d10828394c4129061d5b0e
@@ -27,6 +33,8 @@ sources:
     resource: repo://scripts/browser-smoke.mjs
   - id: openwiki-source-bdb951d21aadf79de1168785
     resource: repo://scripts/generate-icons.mjs
+  - id: openwiki-source-1ca83987ca8dbafc970f7a01
+    resource: repo://scripts/prepare-whisper.mjs
   - id: openwiki-source-e202f83d20831c0b9638b8d3
     resource: repo://src/androidBuild.test.ts
   - id: openwiki-source-7d90f82caec53f32de792b89
@@ -37,7 +45,7 @@ sources:
     resource: repo://src/main.ts
   - id: openwiki-source-5e1b077422a94ae165e88e4e
     resource: repo://vite.config.ts
-generated: { by: "pi", at: "2026-11-14T14:28:39.707Z" }
+generated: { by: "copilot", at: "2026-11-15T17:00:09.797Z" }
 ---
 
 # Configuration, Android packaging, PWA deployment and verification
@@ -110,24 +118,26 @@ Target devices are Google Pixel 8a and HMD Fusion, plus desktop browsers. Physic
 
 `capacitor.config.ts` selects app ID `app.personaldictation.mobile`, label Dictation, `dist-android/` assets, a secure local `https://localhost` origin, blocked mixed content and automatic system-bar margins on Android edge-to-edge displays. The native build uses JDK 21, Java 17 app source/target compatibility with core-library desugaring, minimum API 23 and compile/target API 35. A modern Android System WebView is still required; the manifest minimum alone does not guarantee web API compatibility on old devices.
 
-Install JDK 21, SDK Platform 35, Build Tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1; point `ANDROID_HOME` or ignored `android/local.properties` at the SDK. Then:
+Install JDK 21, SDK Platform 35, Build Tools 35.0.0, NDK 27.2.12479018 and CMake 3.22.1; point `ANDROID_HOME` or ignored `android/local.properties` at the SDK. The Vulkan build additionally needs host C/C++ compilers, Ninja, Vulkan C++ headers and a compatible `glslc`. One tested Linux x86-64 toolchain uses GCC 12.2, Ninja 1.10.2 and an isolated conda-forge environment containing `shaderc=2025.5` and `libvulkan-headers=1.4.313.0`; its `glslc --version` reports shaderc v2023.8. See the README for installation and explicit tool-path overrides. Then:
 
 ```sh
 npm ci
-npm run android:apk
+ORG_GRADLE_PROJECT_dictationVulkan=true npm run android:apk
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
+# Copy the APK before building the other mode, which uses the same output path.
+ORG_GRADLE_PROJECT_dictationVulkan=false npm run android:apk
 # Or prepare native source and open Android Studio:
 npm run android:prepare-whisper
 npm run android:open
 ```
 
-`build:android` type-checks and runs Vite in `android` mode into `dist-android/`, leaving `dist/` independent. `android:sync` builds and runs `cap sync android`; `android:apk` and `android:bundle` first prepare pinned whisper.cpp v1.7.6 source and then assemble a debug APK or unsigned release AAB. Native CMake compiles ARM64/x86-64 CPU Whisper; the vendor checkout is ignored and excluded from Vitest's app-only test discovery. Re-sync after web/plugin changes. Use Android Studio's signed-bundle/APK flow for release distribution, secure the private keystore outside Git, select a permanent ID, increment versions and meet current store SDK/privacy requirements before publishing. See the [README Android guide](../../README.md#android-apk).
+`build:android` type-checks and runs Vite in `android` mode into `dist-android/`, leaving `dist/` independent. `android:sync` builds and runs `cap sync android`; `android:apk` and `android:bundle` first prepare pinned whisper.cpp v1.7.6 source, including the repository's Vulkan dynamic-dispatch patch, and then assemble a debug APK or unsigned release AAB. Native CMake builds ARM64/x86-64 CPU Whisper in both modes and an optional Vulkan backend in GPU mode; CPU-only builds do not need Vulkan tools. GPU runtime use and fallback depend on the device and driver and must be tested. The vendor checkout is ignored and excluded from Vitest's app-only test discovery. Re-sync after web/plugin changes. Use Android Studio's signed-bundle/APK flow for release distribution, secure the private keystore outside Git, select a permanent ID, increment versions and meet current store SDK/privacy requirements before publishing. See the [README Android guide](../../README.md#android-apk).
 
 The manifest declares Internet, network-state, recording and audio-settings permissions and a required microphone; Capacitor's WebView bridge prompts at first `getUserMedia`. If permission is permanently denied, enable it in Android app settings. Backup is disabled to avoid backing up WebView-local keys/settings. Entered keys are still ordinary localStorage, not encrypted keystore storage, and are separate from Chrome's origin storage. Clear app data to remove them.
 
 `MainActivity` holds `FLAG_KEEP_SCREEN_ON` while the activity is visible; no foreground recording service or guaranteed background/locked-screen capture exists. Process termination and Back can discard memory-only work, and WebView unload warnings are unreliable. JSON export uses Filesystem's UTF-8 private cache and Share's native file-URI handling rather than unreliable WebView Blob downloads. It needs no broad external-storage permission. The latest cached `transcript.json` can remain until cache/app data is cleared; selected share targets control their own copies.
 
-`.github/workflows/android.yml` builds a debug APK on relevant pull requests, pushes to main/master or manual dispatch and uploads `dictation-android-debug` for 14 days. It uses Node 22, JDK 21, SDK 35, `npm ci`, unit tests and `android:apk`. Debug signing is for testing; different CI debug keys can prevent in-place updates. Native assets are bundled and the PWA worker is not registered, so no hosting or initial online shell fetch is needed. Groq transcription still needs connectivity; prepared local Whisper runs without it. Download the 32 MB verified multilingual tiny model through Settings before going offline. Connect an existing private `owner/repository` on `main` with a Contents read/write PAT imported from `.git_credentials`; remote creation/OAuth are not implemented. Every changed snapshot schedules background Git retry, and the top-right Ready-state button syncs immediately or queues offline. See [native setup and failure semantics](../architecture/device-services.md). A configured activity collector must allow `https://localhost` via CORS.
+`.github/workflows/android.yml` builds CPU and Vulkan debug APKs on relevant pull requests, pushes to main/master or manual dispatch, checks the packaged backend libraries and uploads separate `dictation-android-cpu-debug` and `dictation-android-vulkan-debug` artifacts for 14 days. It uses Node 22, JDK 21, SDK 35, `npm ci`, unit tests and `android:apk`. Debug signing is for testing; different CI debug keys can prevent in-place updates. Native assets are bundled and the PWA worker is not registered, so no hosting or initial online shell fetch is needed. Groq transcription still needs connectivity; prepared local Whisper runs without it. Download the 32 MB verified multilingual tiny model through Settings before going offline. Connect an existing private `owner/repository` on `main` with a Contents read/write PAT imported from `.git_credentials`; remote creation/OAuth are not implemented. Every changed snapshot schedules background Git retry, and the top-right Ready-state button syncs immediately or queues offline. See [native setup and failure semantics](../architecture/device-services.md). A configured activity collector must allow `https://localhost` via CORS.
 
 The app header, PWA icons and Android launcher icons use the same purple wave artwork from `public/icon.svg`. After editing it, run `node scripts/generate-icons.mjs` (requires ImageMagick's `convert`), then `npm run android:sync`. The generator updates 192/512 PWA PNGs, a full-background maskable icon, legacy square/round launchers and transparent adaptive foregrounds for all densities, the purple adaptive background color, and fallback drawable resources.
 
