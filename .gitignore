@@ -8,3 +8,4 @@ android/app/src/main/cpp/vendor/
 *.ggml
 *.gguf
 *.bin
+host_tools/
