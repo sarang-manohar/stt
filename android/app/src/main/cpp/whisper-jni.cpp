@@ -1,5 +1,6 @@
 #include <jni.h>
 #include <whisper.h>
+#include <ggml-backend.h>
 #include <algorithm>
 #include <cstdint>
 #include <cstring>
@@ -13,6 +14,12 @@ namespace {
 std::mutex lock;
 whisper_context *context = nullptr;
 bool gpu_active = false;
+bool backends_loaded = false;
+void whisper_log(enum ggml_log_level level, const char *text, void *) {
+    if (strstr(text, "whisper_backend_init_gpu: using ")) gpu_active = true;
+    if (strstr(text, "whisper_backend_init_gpu: failed to initialize ")) gpu_active = false;
+    __android_log_print(level == GGML_LOG_LEVEL_ERROR ? ANDROID_LOG_ERROR : ANDROID_LOG_INFO, "dictation-whisper", "%s", text);
+}
 void fail(JNIEnv *env, const char *message) { env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), message); }
 std::string quote(const std::string &text) {
     std::string result = "\"";
@@ -33,7 +40,7 @@ const char *HINDI_INITIAL_PROMPT = "नमस्ते, कैसे हैं �
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv *env, jclass, jstring path, jbyteArray audio, jstring language) {
+Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv *env, jclass, jstring path, jbyteArray audio, jstring language, jstring library_dir) {
     std::lock_guard<std::mutex> guard(lock);
     const auto size = env->GetArrayLength(audio);
     if (size < 44 || size > 400000) { fail(env, "Invalid audio size."); return nullptr; }
@@ -45,23 +52,31 @@ Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv
         fail(env, "Expected mono 16 kHz PCM WAV."); return nullptr;
     }
     if (!context) {
+        if (!backends_loaded) {
+            const char *directory = env->GetStringUTFChars(library_dir, nullptr);
+            std::string base(directory);
+            env->ReleaseStringUTFChars(library_dir, directory);
+            if (!ggml_backend_load((base + "/libggml-cpu.so").c_str())) {
+                fail(env, "Cannot load offline CPU backend."); return nullptr;
+            }
+            if (!ggml_backend_load((base + "/libggml-vulkan.so").c_str())) {
+                __android_log_print(ANDROID_LOG_INFO, "dictation-whisper", "Vulkan unavailable; using CPU.");
+            }
+            backends_loaded = true;
+        }
         const char *filename = env->GetStringUTFChars(path, nullptr);
         auto parameters = whisper_context_default_params();
-        // Try GPU offloading first (Vulkan/OpenCL), fall back to CPU.
+        whisper_log_set(whisper_log, nullptr);
+        gpu_active = false;
         parameters.use_gpu = true;
         context = whisper_init_from_file_with_params(filename, parameters);
-        env->ReleaseStringUTFChars(path, filename);
         if (!context) {
-            // GPU unavailable: retry with CPU-only execution.
             parameters.use_gpu = false;
-            context = whisper_init_from_file_with_params(filename, parameters);
-            if (!context) { fail(env, "Cannot load offline Whisper model. Download it again."); return nullptr; }
-            __android_log_print(ANDROID_LOG_INFO, "dictation-whisper", "Whisper running on CPU (GPU unavailable)");
             gpu_active = false;
-        } else {
-            gpu_active = true;
-            __android_log_print(ANDROID_LOG_INFO, "dictation-whisper", "Whisper running on GPU (Vulkan/OpenCL offloading active)");
+            context = whisper_init_from_file_with_params(filename, parameters);
         }
+        env->ReleaseStringUTFChars(path, filename);
+        if (!context) { fail(env, "Cannot load offline Whisper model. Download it again."); return nullptr; }
     }
     const char *lang = env->GetStringUTFChars(language, nullptr);
     std::string requested(lang); env->ReleaseStringUTFChars(language, lang);
@@ -77,13 +92,6 @@ Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv
     params.print_realtime = false; params.print_progress = false; params.print_timestamps = false; params.print_special = false;
     // Hindi/Hinglish initial prompt improves Devanagari script accuracy.
     if (requested == "hi") params.initial_prompt = HINDI_INITIAL_PROMPT;
-    // Voice Activity Detection: skip silence/background noise chunks.
-    params.vad = true;
-    params.vad_params = whisper_vad_default_params();
-    params.vad_params.threshold = 0.6f;
-    params.vad_params.min_speech_duration_ms = 300;
-    params.vad_params.min_silence_duration_ms = 500;
-    params.vad_params.speech_pad_ms = 100;
     if (whisper_full(context, params, pcm.data(), static_cast<int>(pcm.size())) != 0) { fail(env, "Offline inference failed; audio remains queued."); return nullptr; }
     std::string text;
     for (int i = 0; i < whisper_full_n_segments(context); ++i) text += whisper_full_get_segment_text(context, i);
@@ -92,7 +100,8 @@ Java_app_personaldictation_mobile_DictationDevicePlugin_whisperTranscribe(JNIEnv
     auto *timings = whisper_get_timings(context);
     __android_log_print(ANDROID_LOG_INFO, "dictation-whisper", "inference: encode=%.1fms decode=%.1fms gpu=%s lang=%s",
         timings ? timings->encode_ms : -1, timings ? timings->decode_ms : -1, gpu_active ? "yes" : "no", detected ? detected : "auto");
-    std::string json = "{\"text\":" + quote(text) + ",\"language\":" + quote(detected ? detected : "") + "}";
+    std::string json = "{\"text\":" + quote(text) + ",\"language\":" + quote(detected ? detected : "") +
+        ",\"backend\":" + quote(gpu_active ? "vulkan" : "cpu") + "}";
     jbyteArray bytes = env->NewByteArray(json.size());
     env->SetByteArrayRegion(bytes, 0, json.size(), reinterpret_cast<const jbyte *>(json.data()));
     jclass stringClass = env->FindClass("java/lang/String");

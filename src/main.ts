@@ -147,7 +147,7 @@ function render(): void {
   const detection = element('detection');
   detection.hidden = !resolved;
   detection.textContent = resolved
-    ? `${languageSelect.value === 'auto' ? `Detected ${detectedLanguage === 'hi' ? 'Hindi' : detectedLanguage === 'en' ? 'English' : 'unknown'} · ` : ''}${resolved.model === 'whisper-small-local' ? 'small · on-device' : resolved.model === 'whisper-large-v3' ? 'v3' : 'v3-turbo'}` : '';
+    ? `${languageSelect.value === 'auto' ? `Detected ${detectedLanguage === 'hi' ? 'Hindi' : detectedLanguage === 'en' ? 'English' : 'unknown'} · ` : ''}${resolved.model === 'whisper-tiny-local' ? `tiny · on-device · ${resolved.backend === 'vulkan' ? 'Vulkan' : 'CPU'}` : resolved.model === 'whisper-large-v3' ? 'v3' : 'v3-turbo'}` : '';
   record.hidden = recording;
   record.disabled = transitioning || !notesLoaded || !networkKnown;
   record.classList.toggle('recording', recording);
@@ -303,7 +303,7 @@ element('download-model').addEventListener('click', async () => {
   element('offline-model-status').textContent = 'Downloading and verifying 32 MB model…';
   try {
     await device.downloadModel(); modelReady = true;
-    element('offline-model-status').textContent = 'Offline Whisper ready · multilingual tiny q5_1';
+    element('offline-model-status').textContent = 'Offline Whisper ready · multilingual tiny q5_1 · Vulkan preferred, CPU fallback';
     queue.resume();
   } catch (error) { element('offline-model-status').textContent = error instanceof Error ? error.message : 'Download failed; retry while online.'; }
   finally { button.hidden = false; render(); }
@@ -320,7 +320,7 @@ async function initializeDevice(): Promise<void> {
       const saved = await device.loadNotes();
       if (saved.document) documentTranscript.restore(saved.document);
       modelReady = (await device.modelStatus()).ready;
-      element('offline-model-status').textContent = modelReady ? 'Offline Whisper ready · multilingual small Q5_K_M' : 'Model not installed. Download once before going offline.';
+      element('offline-model-status').textContent = modelReady ? 'Offline Whisper ready · multilingual tiny q5_1 · Vulkan preferred, CPU fallback' : 'Model not installed. Download once before going offline.';
     } else {
       const saved = localStorage.getItem('dictation-notes');
       if (saved) documentTranscript.restore(JSON.parse(saved));

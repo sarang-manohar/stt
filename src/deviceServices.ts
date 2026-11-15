@@ -8,7 +8,7 @@ interface DeviceServices {
   saveNotes(options: { document: Record<string, string> }): Promise<void>;
   modelStatus(): Promise<{ ready: boolean }>;
   downloadModel(): Promise<void>;
-  transcribe(options: { audio: string; language: string }): Promise<{ text: string; language?: string }>;
+  transcribe(options: { audio: string; language: string }): Promise<{ text: string; language?: string; backend: 'vulkan' | 'cpu' }>;
 }
 export const device = registerPlugin<DeviceServices>('DictationDevice');
 export const native = Capacitor.isNativePlatform();
@@ -19,7 +19,7 @@ export async function offlineTranscribe(chunk: AudioChunk, language: string): Pr
   let binary = '';
   for (let i = 0; i < bytes.length; i += 8192) binary += String.fromCharCode(...bytes.subarray(i, i + 8192));
   const result = await device.transcribe({ audio: btoa(binary), language: language === 'hinglish' ? 'hi' : language });
-  return { ...result, model: 'whisper-small-local' };
+  return { ...result, model: 'whisper-tiny-local' };
 }
 
 export async function monitorConnectivity(update: (online: boolean) => void): Promise<() => void> {
