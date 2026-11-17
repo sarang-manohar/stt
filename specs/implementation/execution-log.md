@@ -245,3 +245,179 @@ The final device test reported `initialBackend=vulkan`, `alteredModel=not ready;
 
 - `DIC-004 — Expose truthful model download progress and cancellation`.
 - Not started; stop after completing DIC-003.
+
+## Session — 2026-11-17 — DIC-004
+
+- **Task:** `DIC-004 — Expose truthful model download progress and cancellation`
+- **Starting status:** `Ready`
+- **Ending status:** `Implemented — Validation Pending`
+- **Branch:** `master`
+- **Starting commit:** `8c32a8d518699212e88dbdfeadbab80aa1787b4e`
+- **Ending commit:** unchanged
+
+### Scope completed
+
+- Added byte-count progress reporting and cancellation that disconnects the active request, prevents installation after cancellation, and cleans incomplete temporary data.
+- Exposed progress and completion events plus an allowlisted cancel command through the Capacitor plugin and TypeScript contract.
+- Added progress and Cancel controls to Offline Whisper settings. The UI removes the progress listener when the operation settles and presents retryable failure/cancellation messages.
+- Added downloader tests for actual byte progress, cancellation with preservation of a previously valid model, interrupted-transfer cleanup and retry, and invalid replacement rejection.
+
+### Files changed
+
+- `android/app/src/main/java/app/personaldictation/mobile/ModelDownloader.java`
+- `android/app/src/main/java/app/personaldictation/mobile/DictationDevicePlugin.java`
+- `android/app/src/test/java/app/personaldictation/mobile/ModelDownloaderTest.java`
+- `src/deviceServices.ts`
+- `src/main.ts`
+- `index.html`
+- `specs/architecture/05-native-bridge-contract.md`
+- `specs/implementation/backlog.md`
+- `specs/implementation/execution-log.md`
+
+### Validation
+
+| Check | Command / procedure | Result |
+|---|---|---|
+| Android unit tests | `cd android && ./gradlew testDebugUnitTest --tests app.personaldictation.mobile.ModelDownloaderTest --rerun-tasks --console=plain --max-workers=2` | Pass; 9 tests, 0 failures/errors/skips |
+| Web build | `npm run build` | Pass |
+| Web tests | `npm test` | Pass; 10 files, 83 tests |
+| Android build | `cd android && ./gradlew assembleDebug --console=plain --max-workers=2 -PdictationHostC=/usr/bin/gcc -PdictationHostCxx=/usr/bin/g++ -PdictationGlslc=/home/sarang/vulkan-tools/bin/glslc -PdictationVulkanHeaders=/home/sarang/vulkan-tools/include` | Pass; debug APK generated |
+| Diff check | `git diff --check` | Pass |
+| Device validation | `adb devices -l`; Waydroid download/progress/cancel/retry procedure | Not performed; `192.168.240.112:5555` was offline |
+
+### Acceptance criteria
+
+- [x] Progress reflects bytes actually received and readiness follows verification and installation.
+- [x] Cancellation stops transfer, removes partial data, and preserves a previously verified model.
+- [x] Interrupted, cancelled, and failed downloads can be retried; partial model data is not ready.
+- [x] The UI removes the progress listener deliberately and operation failures remain explicit.
+
+### Issues / limitations
+
+- Android device validation is still required to verify event delivery and progress/cancel/retry behavior against the real native plugin. The available Waydroid target was offline.
+
+### Backlog update
+
+- Previous status: `Ready`
+- New status: `Implemented — Validation Pending`
+- Reason/evidence: Focused native tests, all web tests, TypeScript/Vite build, and the Android APK build passed. Device validation remains required and was unavailable.
+
+### Next eligible task
+
+- None while DIC-004 validation is pending. DIC-007 also depends on DIC-001 and DIC-006.
+- Do not start another task in this session.
+
+### Handoff notes
+
+- Resume by bringing an Android target online, then observe byte progress, cancel a transfer, retry it, and confirm the model is reported ready only after checksum validation and atomic installation.
+- No model catalog, engine selection, inference, or credential behavior was changed.
+
+## Session — 2026-11-17 — DIC-004 device validation preflight
+
+- **Task:** `DIC-004 — Expose truthful model download progress and cancellation`
+- **Starting status:** `Implemented — Validation Pending`
+- **Ending status:** `Implemented — Validation Pending`
+- **Branch:** `master`
+- **Starting commit:** `8c32a8d518699212e88dbdfeadbab80aa1787b4e`
+- **Ending commit:** unchanged
+
+### Scope completed
+
+- Rechecked Android tooling, Waydroid, ADB targets, and debug APK metadata read-only, following `.github/copilot-instructions.md`.
+- Did not install/uninstall packages, start/stop services, or change device or repository state.
+
+### Files changed
+
+- `specs/implementation/execution-log.md`
+
+### Validation
+
+| Check | Command / procedure | Result |
+|---|---|---|
+| Android preflight | SDK/ADB/NDK/CMake/Vulkan host-tool discovery | Available; SDK at `/opt/android-sdk`, NDK `27.2.12479018`, CMake 3.22.1 |
+| Device discovery | `adb devices -l`; `waydroid status`; dynamic endpoint discovery | Waydroid session `STOPPED`; discovered endpoint `192.168.240.112:5555` is `offline` |
+| Installed package IDs | Read-only package probes on verified online targets | Not verifiable; no online target |
+| APK metadata | `aapt dump badging` and APK ABI inspection | Existing APK ID `app.personaldictation.mobile`; ABIs `arm64-v8a`, `x86_64`; validation packages not checked on-device |
+
+### Acceptance criteria
+
+- [x] No implementation changes were needed for this preflight.
+- [ ] Required Android progress/cancel/retry validation remains incomplete.
+
+### Issues / limitations
+
+- No online Android target is available. Device behavior and installed package IDs remain unverified.
+
+### Backlog update
+
+- Previous status: `Implemented — Validation Pending`
+- New status: `Implemented — Validation Pending`
+- Reason/evidence: A read-only preflight confirmed Waydroid is stopped and its ADB endpoint is offline; no device validation could be performed.
+
+### Next eligible task
+
+- None while DIC-004 validation is pending.
+- Do not start another task in this session.
+
+### Handoff notes
+
+- Resume on a verified online Android target. Confirm installed app IDs before deployment, then exercise actual progress, cancellation, retry, and readiness after installation.
+
+## Session — 2026-11-17 — DIC-004 on-device validation
+
+- **Task:** `DIC-004 — Expose truthful model download progress and cancellation`
+- **Starting status:** `Implemented — Validation Pending`
+- **Ending status:** `Verified`
+- **Branch:** `master`
+- **Starting commit:** `8c32a8d518699212e88dbdfeadbab80aa1787b4e`
+- **Ending commit:** unchanged
+
+### Scope completed
+
+- Synced the current web build into Android assets; verified the new APK contained `cancel-model-download` and `model-download-progress`.
+- Reinstalled the app only after the user uninstalled the existing package. Verified the package ID before installation and preserved app data during installation; the fresh app had no existing model.
+- Observed live progress in the settings UI, verified Cancel was visible/enabled, and confirmed the app's same Download action can retry after cancellation.
+- Verified the completed retry reached Ready with the pinned model size and SHA-256 and left no partial file.
+
+### Files changed
+
+- `specs/implementation/backlog.md`
+- `specs/implementation/execution-log.md`
+- The DIC-004 implementation files from the prior session were unchanged.
+
+### Validation
+
+| Check | Command / procedure | Result |
+|---|---|---|
+| Android asset sync | `npm run android:sync` | Pass |
+| APK build | `cd android && ./gradlew assembleDebug --console=plain --max-workers=2 -PdictationHostC=/usr/bin/gcc -PdictationHostCxx=/usr/bin/g++ -PdictationGlslc=/home/sarang/vulkan-tools/bin/glslc -PdictationVulkanHeaders=/home/sarang/vulkan-tools/include` | Pass; APK ID `app.personaldictation.mobile`, ABIs `arm64-v8a` and `x86_64`, current progress/cancel controls present in packaged web assets |
+| Fresh install | `adb -s 192.168.240.112:5555 install /home/sarang/Documents/stt/android/app/build/outputs/apk/debug/app-debug.apk` | Pass; device package path verified; no pre-existing model in app files |
+| Progress UI | Start download in settings and inspect on Waydroid Android 13 x86_64 | Pass; observed `28.2 / 30.7 MB`, 91.8675%, Cancel visible/enabled |
+| Cancellation | User exercised Cancel on the installed current build | Pass per user's on-device confirmation. An earlier automated tap raced with the fast transfer and that attempt completed rather than cancelling. |
+| Retry/readiness | Tap Download again after cancellation; inspect status and app-private files | Pass; Ready; model size `32152673`; SHA-256 `818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7`; no `.part` file |
+| Final diff check | `git diff --check` | Pass |
+
+### Acceptance criteria
+
+- [x] Progress reflects bytes actually received and readiness follows verification and installation.
+- [x] Cancellation stops transfer, removes partial data, and preserves a previously verified model.
+- [x] Interrupted, cancelled, and failed downloads can be retried; partial model data is not ready.
+- [x] The UI removes the progress listener deliberately and operation failures remain explicit.
+
+### Issues / limitations
+
+- None known for DIC-004. Physical ARM and microphone validation were not part of this task.
+
+### Backlog update
+
+- Previous status: `Implemented — Validation Pending`
+- New status: `Verified`
+- Reason/evidence: Native and web tests passed; the freshly synced APK exposed the intended UI, device progress was observed, cancellation was confirmed by the user, and the subsequent download completed with the pinned model digest and no partial file.
+
+### Next eligible task
+
+- None; there are no `Ready` tasks. Do not start another task in this session.
+
+### Handoff notes
+
+- DIC-007 remains dependent on DIC-001, DIC-004, and DIC-006. No follow-up task was started.

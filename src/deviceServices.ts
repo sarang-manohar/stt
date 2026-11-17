@@ -4,10 +4,12 @@ import type { AudioChunk, TranscriptionResult } from './transcriptionQueue';
 interface DeviceServices {
   networkStatus(): Promise<{ online: boolean }>;
   addListener(event: 'networkChanged', listener: (status: { online: boolean }) => void): Promise<PluginListenerHandle>;
+  addListener(event: 'modelDownloadProgress', listener: (progress: { bytesReceived: number; totalBytes: number }) => void): Promise<PluginListenerHandle>;
   loadNotes(): Promise<{ document?: Record<string, string> }>;
   saveNotes(options: { document: Record<string, string> }): Promise<void>;
   modelStatus(): Promise<{ ready: boolean }>;
   downloadModel(): Promise<void>;
+  cancelModelDownload(): Promise<{ cancelled: boolean }>;
   transcribe(options: { audio: string; language: string }): Promise<{ text: string; language?: string; backend: 'vulkan' | 'cpu' }>;
 }
 export const device = registerPlugin<DeviceServices>('DictationDevice');

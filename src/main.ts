@@ -299,14 +299,57 @@ panel.addEventListener('focusout', event => {
 element('device-settings').hidden = !native;
 element('download-model').addEventListener('click', async () => {
   const button = element<HTMLButtonElement>('download-model');
+  const cancelButton = element<HTMLButtonElement>('cancel-model-download');
+  const progress = element<HTMLProgressElement>('model-download-progress');
+  const status = element('offline-model-status');
+  let progressListener: Awaited<ReturnType<typeof device.addListener>> | undefined;
+  let downloadError: string | undefined;
   button.hidden = true;
-  element('offline-model-status').textContent = 'Downloading and verifying 32 MB model…';
+  cancelButton.hidden = false;
+  cancelButton.disabled = false;
+  progress.hidden = false;
+  progress.value = 0;
+  status.textContent = 'Starting model download…';
   try {
+    progressListener = await device.addListener('modelDownloadProgress', ({ bytesReceived, totalBytes }) => {
+      if (!Number.isSafeInteger(bytesReceived) || !Number.isSafeInteger(totalBytes)
+          || bytesReceived < 0 || totalBytes <= 0 || bytesReceived > totalBytes) return;
+      progress.value = (bytesReceived / totalBytes) * 100;
+      const receivedMb = (bytesReceived / 1048576).toFixed(1);
+      const totalMb = (totalBytes / 1048576).toFixed(1);
+      status.textContent = `Downloading and verifying model… ${Math.floor(progress.value)}% (${receivedMb} / ${totalMb} MB)`;
+    });
     await device.downloadModel(); modelReady = true;
-    element('offline-model-status').textContent = 'Offline Whisper ready · multilingual tiny q5_1 · Vulkan preferred, CPU fallback';
+    status.textContent = 'Offline Whisper ready · multilingual tiny q5_1 · Vulkan preferred, CPU fallback';
     queue.resume();
-  } catch (error) { element('offline-model-status').textContent = error instanceof Error ? error.message : 'Download failed; retry while online.'; }
-  finally { button.hidden = false; render(); }
+  } catch (error) {
+    downloadError = error instanceof Error ? error.message : 'Download failed; retry while online.';
+    status.textContent = downloadError;
+  } finally {
+    try {
+      await progressListener?.remove();
+    } catch (error) {
+      const cleanupError = error instanceof Error ? error.message : 'unknown error';
+      status.textContent = `${downloadError ? `${downloadError} ` : ''}Could not remove model progress listener: ${cleanupError}`;
+    }
+    progress.hidden = true;
+    cancelButton.hidden = true;
+    cancelButton.disabled = false;
+    button.hidden = false;
+    render();
+  }
+});
+element<HTMLButtonElement>('cancel-model-download').addEventListener('click', async () => {
+  const button = element<HTMLButtonElement>('cancel-model-download');
+  button.disabled = true;
+  element('offline-model-status').textContent = 'Cancelling model download…';
+  try {
+    const result = await device.cancelModelDownload();
+    if (!result.cancelled) element('offline-model-status').textContent = 'Model installation is finishing…';
+  } catch (error) {
+    element('offline-model-status').textContent = error instanceof Error ? error.message : 'Could not cancel model download.';
+    button.disabled = false;
+  }
 });
 async function initializeDevice(): Promise<void> {
   try {

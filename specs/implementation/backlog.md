@@ -9,11 +9,13 @@ the review remains the baseline assessment and has not been modified.
 - Last reviewed: 2026-11-17
 - Current branch: `master`
 - Active task: `None`
-- Ready tasks: `1`
+- Ready tasks: `0`
+- In Progress tasks: `0`
+- Implemented — Validation Pending tasks: `0`
 - Backlog tasks: `6`
 - Blocked tasks: `0`
-- Verified tasks: `1`
-- First eligible task: `DIC-004 — Expose truthful model download progress and cancellation`
+- Verified tasks: `2`
+- First eligible task: `None`; no task is Ready.
 
 ## Selection rules
 
@@ -275,7 +277,7 @@ validation.
 ### DIC-004 — Expose truthful model download progress and cancellation
 
 - **Title:** Expose truthful model download progress and cancellation
-- **Status:** `Ready`
+- **Status:** `Verified`
 - **Priority:** `P1`
 - **Source review findings:** `FR-009`, `FR-016`, `FR-019`
 - **Source requirements:** Functional Design §§2–3, Offline download states and recovery
@@ -312,10 +314,10 @@ recovery behavior.
 
 #### Acceptance criteria
 
-- [ ] Progress reflects bytes actually received and does not report ready before integrity verification and installation succeed.
-- [ ] Cancel stops the active download, removes or safely retains only non-ready temporary data, and leaves any previously verified model intact.
-- [ ] Interrupted, cancelled, and failed downloads can be retried; partial data is never reported ready.
-- [ ] Bridge listeners are removed deliberately and operation failures remain explicit.
+- [x] Progress reflects bytes actually received and does not report ready before integrity verification and installation succeed.
+- [x] Cancel stops the active download, removes or safely retains only non-ready temporary data, and leaves any previously verified model intact.
+- [x] Interrupted, cancelled, and failed downloads can be retried; partial data is never reported ready.
+- [x] Bridge listeners are removed deliberately and operation failures remain explicit.
 
 #### Validation plan
 
@@ -335,12 +337,13 @@ recovery behavior.
 
 #### Outcome and evidence
 
-- **Status reason:** `Ready`; the missing behavior and state outcomes are specified, and the current single-model flow avoids unresolved catalog decisions.
-- **Files changed:** None; not started.
-- **Tests run:** None; backlog preparation only.
-- **Device validation:** Not performed; required during implementation.
-- **Remaining issues:** None known for task planning.
-- **Follow-up tasks:** `DIC-007`
+- **Status reason:** `Verified`; automated tests, synced APK build, and on-device progress, cancellation, retry, and integrity-readiness checks passed.
+- **Files changed:** `android/app/src/main/java/app/personaldictation/mobile/ModelDownloader.java`, `android/app/src/main/java/app/personaldictation/mobile/DictationDevicePlugin.java`, `android/app/src/test/java/app/personaldictation/mobile/ModelDownloaderTest.java`, `src/deviceServices.ts`, `src/main.ts`, `index.html`, `specs/architecture/05-native-bridge-contract.md`, `specs/implementation/backlog.md`, `specs/implementation/execution-log.md`.
+- **Tests run:** `npm run build` passed; `npm test` passed (10 files, 83 tests); `cd android && ./gradlew testDebugUnitTest --tests app.personaldictation.mobile.ModelDownloaderTest --rerun-tasks --console=plain --max-workers=2` passed (9 tests, 0 failures/errors/skips).
+- **Build:** `npm run android:sync` passed. `cd android && ./gradlew assembleDebug --console=plain --max-workers=2 -PdictationHostC=/usr/bin/gcc -PdictationHostCxx=/usr/bin/g++ -PdictationGlslc=/home/sarang/vulkan-tools/bin/glslc -PdictationVulkanHeaders=/home/sarang/vulkan-tools/include` passed; APK ID and ABIs were checked and its packaged web assets contained both DIC-004 controls.
+- **Device validation:** Waydroid Android 13, x86_64, serial `192.168.240.112:5555`. Freshly installed the current APK after confirming the prior package was uninstalled. Observed UI progress at 91.8675% (`28.2 / 30.7 MB`) with Cancel enabled. An automated Cancel tap raced with the fast transfer and that attempt completed; the user separately confirmed on-device cancellation works. The subsequent Download action (the retry action) reached Ready; `ggml-tiny-q5_1.bin` was 32,152,673 bytes with SHA-256 `818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7`; no `.part` file remained.
+- **Remaining issues:** None known for DIC-004. Physical ARM and microphone validation were not required by this task and were not performed.
+- **Follow-up tasks:** `DIC-007` remains dependent on this task being Verified, as well as `DIC-001` and `DIC-006`.
 
 ---
 

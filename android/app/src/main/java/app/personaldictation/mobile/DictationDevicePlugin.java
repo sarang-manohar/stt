@@ -17,6 +17,7 @@ public class DictationDevicePlugin extends Plugin {
     private ConnectivityManager manager;
     private ConnectivityManager.NetworkCallback callback;
     private volatile boolean downloading;
+    private volatile ModelDownloader.Cancellation modelDownloadCancellation;
     private static final String MODEL_HASH = "818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7";
     private static final long MODEL_SIZE = 32152673;
     private static final String MODEL_URL = "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-tiny-q5_1.bin";
@@ -44,6 +45,8 @@ public class DictationDevicePlugin extends Plugin {
     }
     @Override protected void handleOnDestroy() {
         if (callback != null) manager.unregisterNetworkCallback(callback);
+        ModelDownloader.Cancellation cancellation = modelDownloadCancellation;
+        if (cancellation != null) cancellation.cancel();
         io.shutdown(); inference.shutdown();
     }
     @PluginMethod public void networkStatus(PluginCall call) {
@@ -88,15 +91,44 @@ public class DictationDevicePlugin extends Plugin {
     @PluginMethod public synchronized void downloadModel(PluginCall call) {
         if (downloading) { call.reject("Model download already in progress."); return; }
         downloading = true;
+        ModelDownloader.Cancellation cancellation = new ModelDownloader.Cancellation();
+        modelDownloadCancellation = cancellation;
         io.execute(() -> {
             File temporary = new File(getContext().getFilesDir(), "whisper-download.part");
             try {
                 if (!isOnline(getContext())) throw new IOException("Connect to the internet to download the offline model first.");
-                ModelDownloader.download(MODEL_URL, temporary, model(), MODEL_SIZE, MODEL_HASH);
+                ModelDownloader.download(MODEL_URL, temporary, model(), MODEL_SIZE, MODEL_HASH,
+                    address -> (java.net.HttpURLConnection) address.openConnection(),
+                    cancellation,
+                    (bytesReceived, totalBytes) -> {
+                        JSObject progress = new JSObject();
+                        progress.put("bytesReceived", bytesReceived);
+                        progress.put("totalBytes", totalBytes);
+                        notifyListeners("modelDownloadProgress", progress);
+                    });
+                JSObject result = new JSObject();
+                result.put("ready", true);
+                notifyListeners("modelDownloadCompleted", result);
                 call.resolve();
-            } catch (Exception e) { temporary.delete(); call.reject(e.getMessage()); }
-            finally { downloading = false; }
+            } catch (Exception e) {
+                if (temporary.exists() && !temporary.delete()) {
+                    e.addSuppressed(new IOException("Could not remove incomplete model download."));
+                }
+                call.reject(e.getMessage(), e);
+            } finally {
+                synchronized (DictationDevicePlugin.this) {
+                    if (modelDownloadCancellation == cancellation) modelDownloadCancellation = null;
+                    downloading = false;
+                }
+            }
         });
+    }
+    @PluginMethod public void cancelModelDownload(PluginCall call) {
+        ModelDownloader.Cancellation cancellation = modelDownloadCancellation;
+        if (cancellation == null) { call.reject("No model download is in progress."); return; }
+        JSObject result = new JSObject();
+        result.put("cancelled", cancellation.cancel());
+        call.resolve(result);
     }
     @PluginMethod public void transcribe(PluginCall call) {
         String audio = call.getString("audio", ""); String language = call.getString("language", "auto");

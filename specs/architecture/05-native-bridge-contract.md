@@ -47,6 +47,15 @@ native method invocation.
   `connectionStatusChanged`    Groq connectivity
   `applicationError`           Standardized error notification
 
+`modelDownloadProgress` reports `{ bytesReceived, totalBytes }`, where
+`bytesReceived` counts bytes written to the temporary model file and
+`totalBytes` is the pinned model size. Progress is emitted only as bytes
+arrive. `modelDownloadCompleted` is emitted only after integrity verification
+and atomic installation succeed. `cancelModelDownload` returns
+`{ cancelled: boolean }`; the active `downloadModel` request rejects with an
+explicit cancellation error when cancellation succeeds. The web listener is
+removed when the download request settles.
+
 ## TypeScript contract example
 
 ``` typescript

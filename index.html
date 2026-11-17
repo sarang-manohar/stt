@@ -42,7 +42,9 @@
         <section id="device-settings">
           <h2>Offline Whisper</h2>
           <p id="offline-model-status" role="status">Checking model…</p>
+          <progress id="model-download-progress" max="100" value="0" aria-label="Model download progress" hidden></progress>
           <button id="download-model" type="button">Download tiny model (32 MB)</button>
+          <button id="cancel-model-download" type="button" hidden>Cancel download</button>
           <p class="hint">Download once while online, before going offline. Quantized multilingual tiny runs locally; speed and accuracy depend on your device.</p>
         </section>
         <div class="transcription-settings">

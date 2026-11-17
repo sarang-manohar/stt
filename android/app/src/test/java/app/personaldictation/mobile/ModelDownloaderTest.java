@@ -10,6 +10,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -30,7 +33,13 @@ public class ModelDownloaderTest {
         }
         @Override public int getResponseCode() { return status; }
         @Override public String getHeaderField(String name) { return "Location".equals(name) ? location : null; }
-        @Override public InputStream getInputStream() { return new ByteArrayInputStream(body); }
+        @Override public InputStream getInputStream() {
+            return new ByteArrayInputStream(body) {
+                @Override public synchronized int read(byte[] buffer, int offset, int length) {
+                    return super.read(buffer, offset, Math.min(1, length));
+                }
+            };
+        }
         @Override public void disconnect() {}
         @Override public boolean usingProxy() { return false; }
         @Override public void connect() {}
@@ -73,6 +82,80 @@ public class ModelDownloaderTest {
         assertFalse(temporary.exists());
     }
 
+    @Test public void reportsOnlyReceivedBytesAndInstallsAfterVerification() throws Exception {
+        File temporary = new File(folder.getRoot(), "download.part");
+        File destination = new File(folder.getRoot(), "model.bin");
+        List<Long> received = new ArrayList<>();
+        List<Long> totals = new ArrayList<>();
+        ModelDownloader.download("https://example.test/model", temporary, destination, 3, HASH,
+            url -> new Response(url, 200, null, "abc"), new ModelDownloader.Cancellation(),
+            (bytes, total) -> {
+                received.add(bytes);
+                totals.add(total);
+            });
+
+        assertEquals(Arrays.asList(1L, 2L, 3L), received);
+        assertEquals(Arrays.asList(3L, 3L, 3L), totals);
+        assertTrue(ModelDownloader.isValid(destination, 3, HASH));
+        assertFalse(temporary.exists());
+    }
+
+    @Test public void cancellationRemovesPartialFileAndPreservesInstalledModel() throws Exception {
+        File temporary = new File(folder.getRoot(), "download.part");
+        File destination = folder.newFile("model.bin");
+        Files.write(destination.toPath(), "abc".getBytes(StandardCharsets.UTF_8));
+        ModelDownloader.Cancellation cancellation = new ModelDownloader.Cancellation();
+        try {
+            ModelDownloader.download("https://example.test/model", temporary, destination, 3, HASH,
+                url -> new Response(url, 200, null, "abc"), cancellation,
+                (bytes, total) -> cancellation.cancel());
+            fail("Expected cancelled download");
+        } catch (IOException error) {
+            assertTrue(error.getMessage().contains("cancelled"));
+        }
+        assertFalse(temporary.exists());
+        assertTrue(ModelDownloader.isValid(destination, 3, HASH));
+    }
+
+    @Test public void interruptedDownloadCanRetryWithoutTreatingPartialDataAsReady() throws Exception {
+        File temporary = new File(folder.getRoot(), "download.part");
+        File destination = new File(folder.getRoot(), "model.bin");
+        try {
+            ModelDownloader.download("https://example.test/model", temporary, destination, 3, HASH,
+                url -> new HttpURLConnection(url) {
+                    @Override public int getResponseCode() { return 200; }
+                    @Override public InputStream getInputStream() {
+                        return new InputStream() {
+                            private boolean sentByte;
+                            @Override public int read() throws IOException {
+                                if (sentByte) throw new IOException("Connection interrupted.");
+                                sentByte = true;
+                                return 'a';
+                            }
+                            @Override public int read(byte[] buffer, int offset, int length) throws IOException {
+                                if (sentByte) throw new IOException("Connection interrupted.");
+                                sentByte = true;
+                                buffer[offset] = 'a';
+                                return 1;
+                            }
+                        };
+                    }
+                    @Override public void disconnect() {}
+                    @Override public boolean usingProxy() { return false; }
+                    @Override public void connect() {}
+                });
+            fail("Expected interrupted transfer");
+        } catch (IOException error) {
+            assertTrue(error.getMessage().contains("interrupted"));
+        }
+        assertFalse(temporary.exists());
+        assertFalse(destination.exists());
+
+        ModelDownloader.download("https://example.test/model", temporary, destination, 3, HASH,
+            url -> new Response(url, 200, null, "abc"));
+        assertTrue(ModelDownloader.isValid(destination, 3, HASH));
+    }
+
     @Test public void rejectsInsecureRedirect() throws Exception {
         try {
             ModelDownloader.download("https://example.test/model", new File(folder.getRoot(), "part"),
@@ -86,7 +169,8 @@ public class ModelDownloaderTest {
 
     @Test public void rejectsBadBytesWithoutReplacingExistingModel() throws Exception {
         File destination = folder.newFile("model");
-        Files.write(destination.toPath(), "old".getBytes(StandardCharsets.UTF_8));
+        Files.write(destination.toPath(), "abc".getBytes(StandardCharsets.UTF_8));
+        assertTrue(ModelDownloader.isValid(destination, 3, HASH));
         try {
             ModelDownloader.download("https://example.test/model", new File(folder.getRoot(), "part"),
                 destination, 3, HASH, url -> new Response(url, 200, null, "bad"));
@@ -94,7 +178,7 @@ public class ModelDownloaderTest {
         } catch (IOException error) {
             assertTrue(error.getMessage().contains("verification"));
         }
-        assertEquals("old", new String(Files.readAllBytes(destination.toPath()), StandardCharsets.UTF_8));
+        assertTrue(ModelDownloader.isValid(destination, 3, HASH));
     }
 
     @Test public void reportsHttpStatus() throws Exception {
