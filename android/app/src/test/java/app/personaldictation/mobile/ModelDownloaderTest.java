@@ -45,6 +45,23 @@ public class ModelDownloaderTest {
         assertFalse(ModelDownloader.isValid(new File(folder.getRoot(), "missing"), 3, HASH));
     }
 
+    @Test public void rejectsSameSizeAlteredModelBeforeInference() throws Exception {
+        File model = folder.newFile("model");
+        Files.write(model.toPath(), "abc".getBytes(StandardCharsets.UTF_8));
+        assertTrue(ModelDownloader.isValid(model, 3, HASH));
+        ModelDownloader.requireValid(model, 3, HASH);
+
+        Files.write(model.toPath(), "bad".getBytes(StandardCharsets.UTF_8));
+        assertEquals(3, model.length());
+        assertFalse(ModelDownloader.isValid(model, 3, HASH));
+        try {
+            ModelDownloader.requireValid(model, 3, HASH);
+            fail("Expected altered model to be rejected before inference");
+        } catch (IOException error) {
+            assertTrue(error.getMessage().contains("integrity verification"));
+        }
+    }
+
     @Test public void followsHttpsRedirectAndInstallsVerifiedBytes() throws Exception {
         File temporary = new File(folder.getRoot(), "download.part");
         File destination = new File(folder.getRoot(), "model.bin");

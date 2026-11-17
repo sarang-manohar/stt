@@ -9,3 +9,4 @@ android/app/src/main/cpp/vendor/
 *.gguf
 *.bin
 host-tools/
+shaderc-session/

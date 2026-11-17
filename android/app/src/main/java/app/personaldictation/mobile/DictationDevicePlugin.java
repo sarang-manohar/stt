@@ -103,6 +103,7 @@ public class DictationDevicePlugin extends Plugin {
         inference.execute(() -> {
             try {
                 if (!model().isFile() || model().length() != MODEL_SIZE) throw new IOException("Download the offline Whisper model in Settings while online first. Captured audio stays queued.");
+                ModelDownloader.requireValid(model(), MODEL_SIZE, MODEL_HASH);
                 if (audio.length() > 500000) throw new IOException("Audio chunk too large.");
                 String text = whisperTranscribe(model().getAbsolutePath(), Base64.decode(audio, Base64.DEFAULT), language, getContext().getApplicationInfo().nativeLibraryDir);
                 JSObject result = new JSObject(text); call.resolve(result);

@@ -25,6 +25,13 @@ final class ModelDownloader {
         return expectedHash.equals(hex(digest.digest()));
     }
 
+    static void requireValid(File model, long expectedSize, String expectedHash)
+            throws IOException, NoSuchAlgorithmException {
+        if (!isValid(model, expectedSize, expectedHash)) {
+            throw new IOException("Offline Whisper model failed integrity verification. Download it again in Settings.");
+        }
+    }
+
     private static String hex(byte[] bytes) {
         StringBuilder hash = new StringBuilder();
         for (byte b : bytes) hash.append(String.format("%02x", b & 255));
